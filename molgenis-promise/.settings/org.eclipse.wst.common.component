@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="molgenis-app">
+        <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
+        <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/.apt_generated"/>
+        <wb-resource deploy-path="/" source-path="/src/main/java"/>
+        <wb-resource deploy-path="/" source-path="/target/generated-sources/annotations"/>
+        <wb-resource deploy-path="/" source-path="/src/main/resources"/>
+        <wb-resource deploy-path="/" source-path="/src/test/java"/>
+        <wb-resource deploy-path="/" source-path="/src/test/resources"/>
+        <wb-resource deploy-path="/" source-path="/target/generated-sources/molgenis/java"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/target/generated-sources/molgenis/java"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/target/generated-sources/jaxb"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/target/generated-sources/annotations"/>
+        <dependent-module archiveName="molgenis-core-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-core/molgenis-core">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-data-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-data/molgenis-data">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-security-core-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-security-core/molgenis-security-core">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-core-ui-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-core-ui/molgenis-core-ui">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-data-system-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-data-system/molgenis-data-system">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-data-validation-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-data-validation/molgenis-data-validation">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-file-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-file/molgenis-file">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-security-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-security/molgenis-security">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-dataexplorer-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-dataexplorer/molgenis-dataexplorer">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-pathways-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-pathways/molgenis-pathways">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-data-excel-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-data-excel/molgenis-data-excel">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-data-csv-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-data-csv/molgenis-data-csv">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-data-googlespreadsheet-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-data-googlespreadsheet/molgenis-data-googlespreadsheet">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-python-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-python/molgenis-python">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-scripts-core-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-scripts-core/molgenis-scripts-core">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-r-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-r/molgenis-r">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-data-annotators-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-data-annotators/molgenis-data-annotators">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-charts-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-charts/molgenis-charts">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-data-rest-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-data-rest/molgenis-data-rest">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-js-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-js/molgenis-js">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-data-merge-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-data-merge/molgenis-data-merge">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-jobs-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-jobs/molgenis-jobs">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-data-vcf-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-data-vcf/molgenis-data-vcf">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-data-mapper-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-data-mapper/molgenis-data-mapper">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-ontology-core-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-ontology-core/molgenis-ontology-core">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-data-import-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-data-import/molgenis-data-import">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-data-mysql-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-data-mysql/molgenis-data-mysql">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-data-elasticsearch-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-data-elasticsearch/molgenis-data-elasticsearch">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-data-idcard-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-data-idcard/molgenis-data-idcard">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-das-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-das/molgenis-das">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-model-registry-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-model-registry/molgenis-model-registry">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-ontology-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-ontology/molgenis-ontology">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-data-semanticsearch-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-data-semanticsearch/molgenis-data-semanticsearch">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-data-migrate-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-data-migrate/molgenis-data-migrate">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-questionnaires-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-questionnaires/molgenis-questionnaires">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-catalogue-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-catalogue/molgenis-catalogue">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-scripts-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-scripts/molgenis-scripts">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-file-ingester-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-file-ingester/molgenis-file-ingester">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="molgenis-gavin-1.22.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/molgenis-gavin/molgenis-gavin">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <property name="context-root" value="molgenis-app"/>
+        <property name="component.exclusion.patterns" value="WEB-INF/lib/commons-logging-*.jar,%regex[WEB-INF/lib/log4j-(?!over-slf4j).*.jar]"/>
+        <property name="java-output-path" value="/molgenis-app/target/classes"/>
+    </wb-module>
+</project-modules>
