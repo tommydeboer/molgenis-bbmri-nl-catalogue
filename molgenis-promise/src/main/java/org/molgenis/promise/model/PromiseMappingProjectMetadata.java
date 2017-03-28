@@ -24,11 +24,6 @@ public class PromiseMappingProjectMetadata extends SystemEntityType
 	public static final String CREDENTIALS = "Credentials";
 	public static final String MAPPER = "mapper";
 
-	public static final String LBL_NAME = "Name";
-	public static final String LBL_BIOBANK_ID = "Biobank ID";
-	public static final String LBL_CREDENTIALS = "Credentials";
-	public static final String LBL_MAPPER = "Mapper";
-
 	private final PromisePackage promisePackage;
 	private PromiseCredentialsMetadata promiseCredentialsMetaData;
 
@@ -47,12 +42,12 @@ public class PromiseMappingProjectMetadata extends SystemEntityType
 		setLabel("ProMISe mapping projects");
 		setPackage(promisePackage);
 
-		addAttribute(NAME, ROLE_ID).setLabel(LBL_NAME).setDescription("The name of this mapping");
-		addAttribute(BIOBANK_ID).setNillable(false).setLabel(LBL_BIOBANK_ID)
+		addAttribute(NAME, ROLE_ID).setLabel("Name").setDescription("The name of this mapping");
+		addAttribute(BIOBANK_ID).setNillable(false).setLabel("Biobank ID")
 				.setDescription("The ID of the biobank in the BBMRI-NL Sample Collections entity").setUnique(true);
 		addAttribute(CREDENTIALS).setDataType(XREF).setRefEntity(promiseCredentialsMetaData).setNillable(false)
-				.setLabel(LBL_CREDENTIALS).setDescription("The ProMISe credentials for this biobank");
-		addAttribute(MAPPER).setNillable(false).setLabel(LBL_MAPPER)
+				.setLabel("Credentials").setDescription("The ProMISe credentials for this biobank");
+		addAttribute(MAPPER).setNillable(false).setLabel("Mapper")
 				.setDescription("The mapper to use for this biobank");
 	}
 

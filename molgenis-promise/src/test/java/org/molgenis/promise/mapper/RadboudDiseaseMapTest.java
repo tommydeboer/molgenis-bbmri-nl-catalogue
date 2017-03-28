@@ -1,10 +1,13 @@
 package org.molgenis.promise.mapper;
 
-import autovalue.shaded.com.google.common.common.collect.Lists;
+import com.google.common.collect.Lists;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -12,6 +15,7 @@ import static org.molgenis.promise.mapper.RadboudDiseaseMap.*;
 import static org.molgenis.promise.mapper.RadboudMapper.XML_ID;
 import static org.molgenis.promise.mapper.RadboudMapper.XML_IDAA;
 import static org.molgenis.promise.model.BbmriNlCheatSheet.REF_DISEASE_TYPES;
+import static org.testng.Assert.assertEquals;
 
 public class RadboudDiseaseMapTest
 {
@@ -29,43 +33,43 @@ public class RadboudDiseaseMapTest
 		DataService dataService = mock(DataService.class);
 		radboudDiseaseMap = new RadboudDiseaseMap(dataService);
 
-		when(dataService.findOne(REF_DISEASE_TYPES, URN_MIRIAM_ICD_PREFIX + "C81-C96")).thenReturn(diseaseType1);
-		when(dataService.findOne(REF_DISEASE_TYPES, URN_MIRIAM_ICD_PREFIX + "E11")).thenReturn(diseaseType2);
-		when(dataService.findOne(REF_DISEASE_TYPES, URN_MIRIAM_ICD_PREFIX + "F06.7")).thenReturn(diseaseType3);
-		when(dataService.findOne(REF_DISEASE_TYPES, URN_MIRIAM_ICD_PREFIX + "XXX")).thenReturn(null);
-		when(dataService.findOne(REF_DISEASE_TYPES, "NAV")).thenReturn(diseaseTypeNAV);
+		when(dataService.findOneById(REF_DISEASE_TYPES, URN_MIRIAM_ICD_PREFIX + "C81-C96")).thenReturn(diseaseType1);
+		when(dataService.findOneById(REF_DISEASE_TYPES, URN_MIRIAM_ICD_PREFIX + "E11")).thenReturn(diseaseType2);
+		when(dataService.findOneById(REF_DISEASE_TYPES, URN_MIRIAM_ICD_PREFIX + "F06.7")).thenReturn(diseaseType3);
+		when(dataService.findOneById(REF_DISEASE_TYPES, URN_MIRIAM_ICD_PREFIX + "XXX")).thenReturn(null);
+		when(dataService.findOneById(REF_DISEASE_TYPES, "NAV")).thenReturn(diseaseTypeNAV);
 
-		Entity disease1 = mock(Entity.class);
-		when(disease1.getString(XML_ID)).thenReturn("9000");
-		when(disease1.getString(XML_IDAA)).thenReturn("4");
-		when(disease1.getString(XML_IDAABB)).thenReturn("1");
-		when(disease1.getString(XML_CODENAME)).thenReturn("ICD-10");
-		when(disease1.getString(XML_CODEVERSION)).thenReturn("2015");
-		when(disease1.getString(XML_CODEINDEX)).thenReturn("C81-C96");
-		when(disease1.getString(XML_CODEDESCEN)).thenReturn(
+		Map<String, String> disease1 = new HashMap<>();
+		disease1.put(XML_IDAA, "4");
+		disease1.put(XML_IDAABB, "1");
+		disease1.put(XML_ID, "9000");
+		disease1.put(XML_CODENAME, "ICD-10");
+		disease1.put(XML_CODEVERSION, "2015");
+		disease1.put(XML_CODEINDEX, "C81-C96");
+		disease1.put(XML_CODEDESCEN,
 				"Malignant neoplasms, stated or presumed to be primary, of lymphoid, haematopoietic and related tissue");
 
-		Entity disease2 = mock(Entity.class);
-		when(disease2.getString(XML_ID)).thenReturn("9000");
-		when(disease2.getString(XML_IDAA)).thenReturn("4");
-		when(disease2.getString(XML_IDAABB)).thenReturn("1");
-		when(disease2.getString(XML_CODENAME)).thenReturn("ICD-10");
-		when(disease2.getString(XML_CODEVERSION)).thenReturn("2015");
-		when(disease2.getString(XML_CODEINDEX)).thenReturn("E11");
-		when(disease2.getString(XML_CODEDESCEN)).thenReturn("Type 2 diabetes mellitus");
+		Map<String, String> disease2 = new HashMap<>();
+		disease2.put(XML_ID, "9000");
+		disease2.put(XML_IDAA, "4");
+		disease2.put(XML_IDAABB, "1");
+		disease2.put(XML_CODENAME, "ICD-10");
+		disease2.put(XML_CODEVERSION, "2015");
+		disease2.put(XML_CODEINDEX, "E11");
+		disease2.put(XML_CODEDESCEN, "Type 2 diabetes mellitus");
 
-		Entity disease3 = mock(Entity.class);
-		when(disease3.getString(XML_ID)).thenReturn("9000");
-		when(disease3.getString(XML_IDAA)).thenReturn("8");
-		when(disease3.getString(XML_IDAABB)).thenReturn("1");
-		when(disease3.getString(XML_CODENAME)).thenReturn("ICD-10");
-		when(disease3.getString(XML_CODEVERSION)).thenReturn("2015");
-		when(disease3.getString(XML_CODEINDEX)).thenReturn("F06.7");
-		when(disease3.getString(XML_CODEDESCEN)).thenReturn("Mild cognitive disorder");
+		Map<String, String> disease3 = new HashMap<>();
+		disease3.put(XML_ID, "9000");
+		disease3.put(XML_IDAA, "8");
+		disease3.put(XML_IDAABB, "1");
+		disease3.put(XML_CODENAME, "ICD-10");
+		disease3.put(XML_CODEVERSION, "2015");
+		disease3.put(XML_CODEINDEX, "F06.7");
+		disease3.put(XML_CODEDESCEN, "Mild cognitive disorder");
 
-		Entity disease4 = mock(Entity.class);
-		when(disease4.getString(XML_IDAA)).thenReturn("1");
-		when(disease4.getString(XML_CODENAME)).thenReturn("XXX");
+		Map<String, String> disease4 = new HashMap<>();
+		disease4.put(XML_IDAA, "1");
+		disease4.put(XML_CODENAME, "XXX");
 
 		radboudDiseaseMap.addDisease(disease1);
 		radboudDiseaseMap.addDisease(disease2);

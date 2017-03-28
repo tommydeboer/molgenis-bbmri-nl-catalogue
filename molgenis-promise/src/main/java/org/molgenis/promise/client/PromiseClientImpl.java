@@ -1,7 +1,7 @@
 package org.molgenis.promise.client;
 
 import org.apache.axiom.soap.SOAPMessage;
-import org.molgenis.data.Entity;
+import org.molgenis.promise.model.PromiseCredentials;
 import org.molgenis.security.core.runas.RunAsSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,12 +48,12 @@ public class PromiseClientImpl implements PromiseClient
 	 */
 	@Override
 	@RunAsSystem
-	public void getData(Entity credentials, String seqNr, Consumer<XMLStreamReader> consumer)
+	public void getData(PromiseCredentials promiseCredentials, String seqNr, Consumer<XMLStreamReader> consumer)
 	{
-		requireNonNull(credentials, "Credentials is null");
+		requireNonNull(promiseCredentials, "Credentials is null");
 
-		String url = credentials.get(URL).toString();
-		PromiseRequest request = create(credentials, seqNr);
+		String url = promiseCredentials.get(URL).toString();
+		PromiseRequest request = create(promiseCredentials, seqNr);
 
 		WebServiceMessageCallback requestCallback = webServiceMessage ->
 		{

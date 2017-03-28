@@ -3,6 +3,7 @@ package org.molgenis.promise.client;
 import com.google.common.collect.Maps;
 import org.molgenis.data.Entity;
 import org.molgenis.data.MolgenisDataException;
+import org.molgenis.promise.model.PromiseCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class PromiseDataParser
 		this.promiseClient = Objects.requireNonNull(promiseClient, "promiseClient is null");
 	}
 
-	public void parse(Entity credentials, Integer seqNr, Consumer<Map<String, String>> entityConsumer) throws IOException
+	public void parse(PromiseCredentials credentials, Integer seqNr, Consumer<Map<String, String>> entityConsumer) throws IOException
 	{
 		promiseClient.getData(credentials, seqNr.toString(), reader ->
 		{

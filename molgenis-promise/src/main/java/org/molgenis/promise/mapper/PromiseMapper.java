@@ -1,10 +1,10 @@
 package org.molgenis.promise.mapper;
 
-import org.molgenis.data.Entity;
+import org.molgenis.promise.model.PromiseMappingProject;
 
 public interface PromiseMapper
 {
-	public String getId();
+	String getId();
 
-	public MappingReport map(Entity project);
+	MappingReport map(PromiseMappingProject promiseMappingProject);
 }

@@ -7,6 +7,7 @@ import org.molgenis.data.Entity;
 import org.molgenis.data.EntityManager;
 import org.molgenis.data.meta.model.Attribute;
 import org.molgenis.data.meta.model.EntityType;
+import org.molgenis.data.support.DynamicEntity;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -159,7 +160,7 @@ public class RadboudBiobankMapperTest
 	@Test
 	public void mapExistingBiobank()
 	{
-		Entity existingCollection = new DynamicEntity(SAMPLE_COLLECTIONS_METADATA, dataService);
+		Entity existingCollection = new DynamicEntity(SAMPLE_COLLECTIONS_METADATA);
 
 		String url = "http://abc.de/";
 
@@ -211,7 +212,7 @@ public class RadboudBiobankMapperTest
 		assertEquals(mappedEntity.get(DESCRIPTION), "Long description");
 
 		// verify new contact person entity is added
-		verify(dataService, atLeastOnce()).findOne(eq(REF_PERSONS), any(String.class));
+		verify(dataService, atLeastOnce()).findOneById(eq(REF_PERSONS), any(String.class));
 		verify(dataService, atLeastOnce()).add(eq(REF_PERSONS), entityCaptor.capture());
 		Iterator<Entity> contactIterator = mappedEntity.getEntities(CONTACT_PERSON).iterator();
 		Entity contactPerson = contactIterator.next();
