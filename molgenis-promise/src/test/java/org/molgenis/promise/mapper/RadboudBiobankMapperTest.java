@@ -106,30 +106,30 @@ public class RadboudBiobankMapperTest
 		radboudBiobankMapper = new RadboudBiobankMapper(dataService, mock(EntityManager.class));
 
 		biobank = Maps.newHashMap();
-		when(biobank.get(XML_ID)).thenReturn("9000");
-		when(biobank.get(XML_IDAA)).thenReturn("1");
-		when(biobank.get(XML_TITLE)).thenReturn("Inflammatoire Darmziekten");
-		when(biobank.get(XML_DESCRIPTION)).thenReturn("Long description");
-		when(biobank.get(XML_CONTACT_PERSON)).thenReturn("Dr. Abc de Fgh");
-		when(biobank.get(XML_ADDRESS1)).thenReturn("afdeling Maag-Darm-Leverziekten");
-		when(biobank.get(XML_ADDRESS2)).thenReturn("Post 123");
-		when(biobank.get(XML_ZIP_CODE)).thenReturn("1234 AB");
-		when(biobank.get(XML_LOCATION)).thenReturn("Poppenwier");
-		when(biobank.get(XML_EMAIL)).thenReturn("abc@def.gh");
-		when(biobank.get(XML_PHONE)).thenReturn("123-4567890");
-		when(biobank.get(XML_TYPEBIOBANK)).thenReturn("1");
-		when(biobank.get(XML_VOORGESCH)).thenReturn("1");
-		when(biobank.get(XML_FAMANAM)).thenReturn("1");
-		when(biobank.get(XML_BEHANDEL)).thenReturn("1");
-		when(biobank.get(XML_FOLLOWUP)).thenReturn("2");
-		when(biobank.get(XML_BEELDEN)).thenReturn("1");
-		when(biobank.get(XML_VRAGENLIJST)).thenReturn("2");
-		when(biobank.get(XML_OMICS)).thenReturn("2");
-		when(biobank.get(XML_ROUTINEBEP)).thenReturn("2");
-		when(biobank.get(XML_GWAS)).thenReturn("2");
-		when(biobank.get(XML_HISTOPATH)).thenReturn("2");
-		when(biobank.get(XML_OUTCOME)).thenReturn("2");
-		when(biobank.get(XML_ANDERS)).thenReturn("2");
+		biobank.put(XML_ID,"9000");
+		biobank.put(XML_IDAA,"1");
+		biobank.put(XML_TITLE,"Inflammatoire Darmziekten");
+		biobank.put(XML_DESCRIPTION,"Long description");
+		biobank.put(XML_CONTACT_PERSON,"Dr. Abc de Fgh");
+		biobank.put(XML_ADDRESS1,"afdeling Maag-Darm-Leverziekten");
+		biobank.put(XML_ADDRESS2,"Post 123");
+		biobank.put(XML_ZIP_CODE,"1234 AB");
+		biobank.put(XML_LOCATION,"Poppenwier");
+		biobank.put(XML_EMAIL,"abc@def.gh");
+		biobank.put(XML_PHONE,"123-4567890");
+		biobank.put(XML_TYPEBIOBANK,"1");
+		biobank.put(XML_VOORGESCH,"1");
+		biobank.put(XML_FAMANAM,"1");
+		biobank.put(XML_BEHANDEL,"1");
+		biobank.put(XML_FOLLOWUP,"2");
+		biobank.put(XML_BEELDEN,"1");
+		biobank.put(XML_VRAGENLIJST,"2");
+		biobank.put(XML_OMICS,"2");
+		biobank.put(XML_ROUTINEBEP,"2");
+		biobank.put(XML_GWAS,"2");
+		biobank.put(XML_HISTOPATH,"2");
+		biobank.put(XML_OUTCOME,"2");
+		biobank.put(XML_ANDERS,"2");
 	}
 
 	@Test
