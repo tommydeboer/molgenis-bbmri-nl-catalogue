@@ -6,6 +6,7 @@ import org.molgenis.data.Entity;
 import org.molgenis.promise.mapper.MappingReport;
 import org.molgenis.promise.mapper.PromiseMapper;
 import org.molgenis.promise.mapper.PromiseMapperFactory;
+import org.molgenis.promise.model.PromiseMappingProject;
 import org.molgenis.security.core.runas.RunAsSystem;
 import org.molgenis.ui.MolgenisPluginController;
 import org.slf4j.Logger;
@@ -77,9 +78,10 @@ public class PromiseDataLoaderController extends MolgenisPluginController
 	@Transactional
 	public MappingReport map(@PathVariable("name") String projectName) throws IOException
 	{
-		Entity project = dataService.findOneById(PROMISE_MAPPING_PROJECT, projectName);
-		PromiseMapper promiseMapper = promiseMapperFactory.getMapper(project.getString("mapper"));
-		return promiseMapper.map(project);
+		PromiseMappingProject promiseMappingProject = dataService
+				.findOneById(PROMISE_MAPPING_PROJECT, projectName, PromiseMappingProject.class);
+		PromiseMapper promiseMapper = promiseMapperFactory.getMapper(promiseMappingProject.getString("mapper"));
+		return promiseMapper.map(promiseMappingProject);
 	}
 
 	@Scheduled(cron = "0 0 0 * * *")
@@ -88,8 +90,9 @@ public class PromiseDataLoaderController extends MolgenisPluginController
 	{
 		// TODO make configurable via MOLGENIS 'scheduler'
 
-		Stream<Entity> projects = dataService.findAll(PROMISE_MAPPING_PROJECT);
-		projects.forEach(project ->
+		Stream<PromiseMappingProject> promiseMappingProjectStream = dataService
+				.findAll(PROMISE_MAPPING_PROJECT, PromiseMappingProject.class);
+		promiseMappingProjectStream.forEach(project ->
 		{
 			LOG.info("Starting scheduled mapping task for ProMISe biobank " + project.getString("name"));
 			PromiseMapper promiseMapper = promiseMapperFactory.getMapper(project.getString("mapper"));

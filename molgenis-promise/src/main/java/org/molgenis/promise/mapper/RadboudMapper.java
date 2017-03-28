@@ -5,6 +5,8 @@ import org.molgenis.data.Entity;
 import org.molgenis.data.EntityManager;
 import org.molgenis.promise.client.PromiseDataParser;
 import org.molgenis.promise.mapper.MappingReport.Status;
+import org.molgenis.promise.model.PromiseCredentials;
+import org.molgenis.promise.model.PromiseMappingProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +18,6 @@ import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
 import static org.molgenis.promise.model.BbmriNlCheatSheet.SAMPLE_COLLECTIONS_ENTITY;
-import static org.molgenis.promise.model.PromiseMappingProjectMetadata.CREDENTIALS;
 
 @Component
 class RadboudMapper implements PromiseMapper, ApplicationListener<ContextRefreshedEvent>
@@ -60,9 +61,9 @@ class RadboudMapper implements PromiseMapper, ApplicationListener<ContextRefresh
 	}
 
 	@Override
-	public MappingReport map(Entity project)
+	public MappingReport map(PromiseMappingProject promiseMappingProject)
 	{
-		requireNonNull(project);
+		requireNonNull(promiseMappingProject);
 
 		MappingReport report = new MappingReport();
 
@@ -72,7 +73,7 @@ class RadboudMapper implements PromiseMapper, ApplicationListener<ContextRefresh
 			RadboudDiseaseMap diseases = new RadboudDiseaseMap(dataService);
 			RadboudBiobankMapper biobankMapper = new RadboudBiobankMapper(dataService, entityManager);
 
-			Entity credentials = project.getEntity(CREDENTIALS);
+			PromiseCredentials credentials = promiseMappingProject.getPromiseCredentials();
 
 			LOG.info("Reading RADBOUD samples");
 			promiseDataParser.parse(credentials, 1, sampleEntity ->

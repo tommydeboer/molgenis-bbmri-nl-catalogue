@@ -39,7 +39,7 @@ public class MarshallingTest extends AbstractTestNGSpringContextTests
 		when(promiseCredentials.getUsername()).thenReturn("userName");
 		when(promiseCredentials.getPassword()).thenReturn("passw");
 
-		PromiseRequest request = PromiseRequest.create(credentials, "10");
+		PromiseRequest request = PromiseRequest.create(promiseCredentials, "10");
 
 		StringResult result = new StringResult();
 		marshaller.marshal(request, result);

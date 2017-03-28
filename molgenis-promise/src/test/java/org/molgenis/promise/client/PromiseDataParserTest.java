@@ -1,9 +1,8 @@
 package org.molgenis.promise.client;
 
 import org.mockito.*;
-import org.molgenis.data.Entity;
 import org.molgenis.data.MolgenisDataException;
-import org.molgenis.data.support.MapEntity;
+import org.molgenis.promise.model.PromiseCredentials;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -12,7 +11,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -24,7 +25,7 @@ public class PromiseDataParserTest
 	private PromiseClient promiseClient;
 
 	@Mock
-	private Entity credentials;
+	private PromiseCredentials promiseCredentials;
 
 	private PromiseDataParser parser;
 
@@ -41,23 +42,23 @@ public class PromiseDataParserTest
 	@Test
 	public void testParse() throws IOException, XMLStreamException
 	{
-		List<Entity> entities = newArrayList();
-		parser.parse(credentials, 0, entities::add);
+		List<Map<String, String>> entities = newArrayList();
+		parser.parse(promiseCredentials, 0, entities::add);
 
 		Mockito.verify(promiseClient)
-				.getData(Mockito.eq(credentials), Mockito.eq("0"), consumerArgumentCaptor.capture());
+				.getData(Mockito.eq(promiseCredentials), Mockito.eq("0"), consumerArgumentCaptor.capture());
 
 		InputStream is = getClass().getResourceAsStream("/cva_biobank_response.xml");
 		XMLStreamReader xmlStreamReader = XMLInputFactory.newInstance().createXMLStreamReader(is);
 		consumerArgumentCaptor.getValue().accept(xmlStreamReader);
 
-		MapEntity entity1 = new MapEntity();
-		entity1.set("PSI_REG_ID", "1006");
-		entity1.set("MATERIAL_TYPES", "DNA_UIT_BLOEDCELLEN,BLOEDPLASMA(EDTA),BLOEDSERUM");
+		Map<String, String> entity1 = new HashMap<>();
+		entity1.put("PSI_REG_ID", "1006");
+		entity1.put("MATERIAL_TYPES", "DNA_UIT_BLOEDCELLEN,BLOEDPLASMA(EDTA),BLOEDSERUM");
 
-		MapEntity entity2 = new MapEntity();
-		entity2.set("PSI_REG_ID", "1042");
-		entity2.set("MATERIAL_TYPES", "OORSMEER");
+		Map<String, String> entity2 = new HashMap<>();
+		entity2.put("PSI_REG_ID", "1042");
+		entity2.put("MATERIAL_TYPES", "OORSMEER");
 
 		assertEquals(entities, newArrayList(entity1, entity2));
 	}
@@ -65,11 +66,11 @@ public class PromiseDataParserTest
 	@Test(expectedExceptions = MolgenisDataException.class, expectedExceptionsMessageRegExp = "Username-Password combination not found<BR>Combinatie Gebruikersnaam-Wachtwoord niet gevonden")
 	public void testErroneousParse() throws IOException, XMLStreamException
 	{
-		List<Entity> entities = newArrayList();
-		parser.parse(credentials, 0, entities::add);
+		List<Map<String, String>> entities = newArrayList();
+		parser.parse(promiseCredentials, 0, entities::add);
 
 		Mockito.verify(promiseClient)
-				.getData(Mockito.eq(credentials), Mockito.eq("0"), consumerArgumentCaptor.capture());
+				.getData(Mockito.eq(promiseCredentials), Mockito.eq("0"), consumerArgumentCaptor.capture());
 
 		InputStream is = getClass().getResourceAsStream("/erroneous_biobank_response.xml");
 		XMLStreamReader xmlStreamReader = XMLInputFactory.newInstance().createXMLStreamReader(is);

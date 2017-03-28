@@ -4,7 +4,7 @@ import org.molgenis.data.Entity;
 import org.molgenis.data.meta.model.EntityType;
 import org.molgenis.data.support.StaticEntity;
 
-import static org.molgenis.promise.model.PromiseCredentialsMetadata.ID;
+import static org.molgenis.promise.model.PromiseMappingProjectMetadata.*;
 
 public class PromiseMappingProject extends StaticEntity
 {
@@ -18,19 +18,49 @@ public class PromiseMappingProject extends StaticEntity
 		super(entityType);
 	}
 
-	public PromiseMappingProject(String id, EntityType entityType)
+	public PromiseMappingProject(String name, EntityType entityType)
 	{
 		super(entityType);
-		setId(id);
+		setName(name);
 	}
 
-	public String getId()
+	public String getName()
 	{
-		return getString(ID);
+		return getString(NAME);
 	}
 
-	public void setId(String id)
+	public void setName(String name)
 	{
-		set(ID, id);
+		set(NAME, name);
+	}
+
+	public String getBiobankId()
+	{
+		return getString(BIOBANK_ID);
+	}
+
+	public void setBiobankId(String biobankId)
+	{
+		set(BIOBANK_ID, biobankId);
+	}
+
+	public PromiseCredentials getPromiseCredentials()
+	{
+		return getEntity(CREDENTIALS, PromiseCredentials.class);
+	}
+
+	public void setPromiseCredentials(String promiseCredentials)
+	{
+		set(CREDENTIALS, promiseCredentials);
+	}
+
+	public String getMapper()
+	{
+		return getString(MAPPER);
+	}
+
+	public void setMapper(String mapper)
+	{
+		set(MAPPER, mapper);
 	}
 }

@@ -8,7 +8,8 @@ import org.molgenis.data.support.DynamicEntity;
 import org.molgenis.promise.client.PromiseDataParser;
 import org.molgenis.promise.mapper.MappingReport.Status;
 import org.molgenis.promise.model.BbmriNlCheatSheet;
-import org.molgenis.promise.model.PromiseMappingProjectMetadata;
+import org.molgenis.promise.model.PromiseCredentials;
+import org.molgenis.promise.model.PromiseMappingProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,23 +100,24 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 	}
 
 	@Override
-	public MappingReport map(Entity project)
+	public MappingReport map(PromiseMappingProject promiseMappingProject)
 	{
-		requireNonNull(project);
+		requireNonNull(promiseMappingProject);
 		MappingReport report = new MappingReport();
 
 		try
 		{
-			LOG.info("Getting data from ProMISe for " + project.getString("name"));
-			Entity credentials = project.getEntity(PromiseMappingProjectMetadata.CREDENTIALS);
+			LOG.info("Getting data from ProMISe for " + promiseMappingProject.getString("name"));
+			PromiseCredentials promiseCredentials = promiseMappingProject.getPromiseCredentials();
 			EntityType targetEntityMetaData = requireNonNull(dataService.getEntityType(SAMPLE_COLLECTIONS_ENTITY));
 
 			// Parse biobanks
-			promiseDataParser.parse(credentials, 0, promiseBiobankEntity ->
+			promiseDataParser.parse(promiseCredentials, 0, promiseBiobankEntity ->
 			{
 
 				// find out if a sample collection with this id already exists
-				Entity targetEntity = dataService.findOneById(SAMPLE_COLLECTIONS_ENTITY, project.getString(BIOBANK_ID));
+				Entity targetEntity = dataService
+						.findOneById(SAMPLE_COLLECTIONS_ENTITY, promiseMappingProject.getString(BIOBANK_ID));
 
 				boolean biobankExists = true;
 				if (targetEntity == null)
@@ -150,9 +152,9 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 				}
 
 				// map data from ProMISe
-				targetEntity.set(BbmriNlCheatSheet.ID, project.getString(BIOBANK_ID));
+				targetEntity.set(BbmriNlCheatSheet.ID, promiseMappingProject.getString(BIOBANK_ID));
 				targetEntity.set(TYPE, toTypes(promiseBiobankEntity.get("COLLECTION_TYPE"))); // mref
-				targetEntity.set(MATERIALS, getMaterialTypes(credentials)); // mref
+				targetEntity.set(MATERIALS, getMaterialTypes(promiseCredentials)); // mref
 				targetEntity.set(SEX, toGenders(promiseBiobankEntity.get("SEX"))); // mref
 				targetEntity.set(AGE_LOW, promiseBiobankEntity.get("AGE_LOW")); // nillable
 				targetEntity.set(AGE_HIGH, promiseBiobankEntity.get("AGE_HIGH")); // nillable
@@ -184,7 +186,7 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 		return report;
 	}
 
-	private Iterable<Entity> getMaterialTypes(Entity credentials)
+	private Iterable<Entity> getMaterialTypes(PromiseCredentials credentials)
 	{
 		try
 		{
@@ -278,12 +280,12 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 	{
 		if (type.equals("weefsel") && tissue != null)
 		{
-			if (tissueTypesMap.containsKey(tissue)) tissueTypesMap.get(tissue).forEach(materialTypeIds::add);
+			if (tissueTypesMap.containsKey(tissue)) materialTypeIds.addAll(tissueTypesMap.get(tissue));
 			else unknownMaterialTypes.add(tissue);
 		}
 		else
 		{
-			if (materialTypesMap.containsKey(type)) materialTypesMap.get(type).forEach(materialTypeIds::add);
+			if (materialTypesMap.containsKey(type)) materialTypeIds.addAll(materialTypesMap.get(type));
 			else unknownMaterialTypes.add(type);
 		}
 	}
