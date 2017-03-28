@@ -136,11 +136,10 @@ public class RadboudSampleMapTest
 	public void testGetDataCategories() throws Exception
 	{
 		Map<String, String> biobank1 = new HashMap<>();
-		//when(biobank.getString(any(String.class))).thenReturn("2");
 
-		biobank1.put(XML_ID,"9000");
-		biobank1.put(XML_IDAA,"100");
-		biobank1.put(XML_BEELDEN,"1");
+		biobank1.put(XML_ID, "9000");
+		biobank1.put(XML_IDAA, "100");
+		biobank1.put(XML_BEELDEN, "1");
 		radboudSampleMap.getDataCategories(biobank1);
 		verify(dataService, atLeastOnce()).findAll(eq(REF_DATA_CATEGORY_TYPES), streamCaptor.capture());
 		assertEquals(streamCaptor.getValue().collect(toSet()), newHashSet("BIOLOGICAL_SAMPLES", "IMAGING_DATA"));
@@ -155,9 +154,9 @@ public class RadboudSampleMapTest
 		assertEquals(streamCaptor.getValue().collect(toSet()), newHashSet("MEDICAL_RECORDS"));
 
 		Map<String, String> biobank3 = new HashMap<>();
-		biobank2.put(XML_ID, "1");
-		biobank2.put(XML_IDAA, "1");
-		biobank2.put(XML_BEHANDEL, "2");
+		biobank3.put(XML_ID, "1");
+		biobank3.put(XML_IDAA, "1");
+		biobank3.put(XML_BEHANDEL, "2");
 		radboudSampleMap.getDataCategories(biobank3);
 		verify(dataService, atLeastOnce()).findAll(eq(REF_DATA_CATEGORY_TYPES), streamCaptor.capture());
 		assertEquals(streamCaptor.getValue().collect(toSet()), newHashSet("NAV"));

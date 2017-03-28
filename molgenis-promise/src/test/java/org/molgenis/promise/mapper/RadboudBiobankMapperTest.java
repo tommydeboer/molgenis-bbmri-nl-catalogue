@@ -8,6 +8,7 @@ import org.molgenis.data.EntityManager;
 import org.molgenis.data.meta.model.Attribute;
 import org.molgenis.data.meta.model.EntityType;
 import org.molgenis.data.support.DynamicEntity;
+import org.molgenis.promise.model.BbmriNlCheatSheet;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -21,6 +22,8 @@ import static java.util.stream.Collectors.toList;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
+import static org.molgenis.data.EntityManager.CreationMode.NO_POPULATE;
+import static org.molgenis.data.EntityManager.CreationMode.POPULATE;
 import static org.molgenis.data.meta.AttributeType.*;
 import static org.molgenis.promise.mapper.RadboudBiobankMapper.*;
 import static org.molgenis.promise.mapper.RadboudMapper.XML_ID;
@@ -44,8 +47,8 @@ public class RadboudBiobankMapperTest
 	private final Entity AGE_TYPE = mock(Entity.class);
 	private final Entity RBB_BIOBANK = mock(Entity.class);
 	private final Entity DISEASE_SPECIFIC = mock(Entity.class);
-	private final EntityType PERSON_METADATA = mock(EntityType.class);
-	private final EntityType SAMPLE_COLLECTIONS_METADATA = mock(EntityType.class);
+
+	private EntityType sampleCollectionsEntityType;
 
 	private ArgumentCaptor<Entity> entityCaptor = ArgumentCaptor.forClass(Entity.class);
 
@@ -57,14 +60,19 @@ public class RadboudBiobankMapperTest
 		radboudSampleMap = mock(RadboudSampleMap.class);
 		radboudDiseaseMap = mock(RadboudDiseaseMap.class);
 
+		sampleCollectionsEntityType = mock(EntityType.class);
+		EntityType personEntityType = mock(EntityType.class);
+		EntityType principalInvestigatorsEntityType = mock(EntityType.class);
+		EntityType juristicPersonEntityType = mock(EntityType.class);
+
 		Stream<Entity> resultStream = mock(Stream.class);
 		List<Entity> resultEntities = mock(List.class);
 		when(resultStream.collect(toList())).thenReturn(resultEntities);
 		when(dataService.findAll(any(String.class), any(Stream.class))).thenReturn(resultStream);
 
 		when(dataService.findOneById(REF_COUNTRIES, "NL")).thenReturn(NL_COUNTRY_ENTITY);
-		when(dataService.getEntityType(REF_PERSONS)).thenReturn(PERSON_METADATA);
-		when(dataService.getEntityType(SAMPLE_COLLECTIONS_ENTITY)).thenReturn(SAMPLE_COLLECTIONS_METADATA);
+		when(dataService.getEntityType(REF_PERSONS)).thenReturn(personEntityType);
+		when(dataService.getEntityType(SAMPLE_COLLECTIONS_ENTITY)).thenReturn(sampleCollectionsEntityType);
 		when(dataService.findOneById(REF_JURISTIC_PERSONS, "83")).thenReturn(JURISTIC_PERSON_83);
 		when(dataService.findOneById(REF_COLLECTION_TYPES, "OTHER")).thenReturn(COLLECTION_OTHER);
 		when(dataService.findOneById(REF_AGE_TYPES, "YEAR")).thenReturn(AGE_TYPE);
@@ -73,63 +81,89 @@ public class RadboudBiobankMapperTest
 
 		Attribute stringAttr = mock(Attribute.class);
 		when(stringAttr.getDataType()).thenReturn(STRING);
+		Attribute intAttr = mock(Attribute.class);
+		when(intAttr.getDataType()).thenReturn(INT);
 		Attribute mrefAttr = mock(Attribute.class);
 		when(mrefAttr.getDataType()).thenReturn(MREF);
 		Attribute xrefAttr = mock(Attribute.class);
 		when(xrefAttr.getDataType()).thenReturn(XREF);
 		Attribute boolAttr = mock(Attribute.class);
 		when(boolAttr.getDataType()).thenReturn(BOOL);
-		when(SAMPLE_COLLECTIONS_METADATA.getAttribute(ID)).thenReturn(stringAttr);
-		when(SAMPLE_COLLECTIONS_METADATA.getAttribute(ACRONYM)).thenReturn(stringAttr);
-		when(SAMPLE_COLLECTIONS_METADATA.getAttribute(PUBLICATIONS)).thenReturn(stringAttr);
-		when(SAMPLE_COLLECTIONS_METADATA.getAttribute(BIOBANK_SAMPLE_ACCESS_URI)).thenReturn(stringAttr);
-		when(SAMPLE_COLLECTIONS_METADATA.getAttribute(WEBSITE)).thenReturn(stringAttr);
-		when(SAMPLE_COLLECTIONS_METADATA.getAttribute(BIOBANK_DATA_ACCESS_URI)).thenReturn(stringAttr);
-		when(SAMPLE_COLLECTIONS_METADATA.getAttribute(PRINCIPAL_INVESTIGATORS)).thenReturn(mrefAttr);
-		when(SAMPLE_COLLECTIONS_METADATA.getAttribute(INSTITUTES)).thenReturn(mrefAttr);
-		when(SAMPLE_COLLECTIONS_METADATA.getAttribute(NAME)).thenReturn(stringAttr);
-		when(SAMPLE_COLLECTIONS_METADATA.getAttribute(TYPE)).thenReturn(mrefAttr);
-		when(SAMPLE_COLLECTIONS_METADATA.getAttribute(AGE_UNIT)).thenReturn(xrefAttr);
-		when(SAMPLE_COLLECTIONS_METADATA.getAttribute(DESCRIPTION)).thenReturn(stringAttr);
-		when(SAMPLE_COLLECTIONS_METADATA.getAttribute(CONTACT_PERSON)).thenReturn(mrefAttr);
-		when(SAMPLE_COLLECTIONS_METADATA.getAttribute(BIOBANKS)).thenReturn(mrefAttr);
-		when(SAMPLE_COLLECTIONS_METADATA.getAttribute(BIOBANK_SAMPLE_ACCESS_FEE)).thenReturn(boolAttr);
-		when(SAMPLE_COLLECTIONS_METADATA.getAttribute(BIOBANK_SAMPLE_ACCESS_JOINT_PROJECTS)).thenReturn(boolAttr);
-		when(SAMPLE_COLLECTIONS_METADATA.getAttribute(BIOBANK_SAMPLE_ACCESS_DESCRIPTION)).thenReturn(stringAttr);
-		when(SAMPLE_COLLECTIONS_METADATA.getAttribute(BIOBANK_DATA_ACCESS_FEE)).thenReturn(boolAttr);
-		when(SAMPLE_COLLECTIONS_METADATA.getAttribute(BIOBANK_DATA_ACCESS_JOINT_PROJECTS)).thenReturn(boolAttr);
-		when(SAMPLE_COLLECTIONS_METADATA.getAttribute(BIOBANK_DATA_ACCESS_DESCRIPTION)).thenReturn(stringAttr);
-		when(PERSON_METADATA.getAttribute(ID)).thenReturn(stringAttr);
-		when(PERSON_METADATA.getAttribute(FIRST_NAME)).thenReturn(stringAttr);
-		when(PERSON_METADATA.getAttribute(COUNTRY)).thenReturn(xrefAttr);
 
-		radboudBiobankMapper = new RadboudBiobankMapper(dataService, mock(EntityManager.class));
+		Attribute principalInvestigatorAttr = mock(Attribute.class);
+		when(principalInvestigatorAttr.getDataType()).thenReturn(MREF);
+		when(principalInvestigatorAttr.getRefEntity()).thenReturn(principalInvestigatorsEntityType);
+
+		Attribute institutesAttr = mock(Attribute.class);
+		when(institutesAttr.getDataType()).thenReturn(MREF);
+		when(institutesAttr.getRefEntity()).thenReturn(juristicPersonEntityType);
+
+		when(sampleCollectionsEntityType.getAttribute(ID)).thenReturn(stringAttr);
+		when(sampleCollectionsEntityType.getAttribute(ACRONYM)).thenReturn(stringAttr);
+		when(sampleCollectionsEntityType.getAttribute(PUBLICATIONS)).thenReturn(stringAttr);
+		when(sampleCollectionsEntityType.getAttribute(BIOBANK_SAMPLE_ACCESS_URI)).thenReturn(stringAttr);
+		when(sampleCollectionsEntityType.getAttribute(WEBSITE)).thenReturn(stringAttr);
+		when(sampleCollectionsEntityType.getAttribute(BIOBANK_DATA_ACCESS_URI)).thenReturn(stringAttr);
+		when(sampleCollectionsEntityType.getAttribute(BbmriNlCheatSheet.PRINCIPAL_INVESTIGATORS))
+				.thenReturn(principalInvestigatorAttr);
+		when(sampleCollectionsEntityType.getAttribute(INSTITUTES)).thenReturn(institutesAttr);
+		when(sampleCollectionsEntityType.getAttribute(NAME)).thenReturn(stringAttr);
+		when(sampleCollectionsEntityType.getAttribute(TYPE)).thenReturn(mrefAttr);
+		when(sampleCollectionsEntityType.getAttribute(AGE_UNIT)).thenReturn(xrefAttr);
+		when(sampleCollectionsEntityType.getAttribute(AGE_LOW)).thenReturn(intAttr);
+		when(sampleCollectionsEntityType.getAttribute(AGE_HIGH)).thenReturn(intAttr);
+		when(sampleCollectionsEntityType.getAttribute(NUMBER_OF_DONORS)).thenReturn(intAttr);
+		when(sampleCollectionsEntityType.getAttribute(DESCRIPTION)).thenReturn(stringAttr);
+		when(sampleCollectionsEntityType.getAttribute(CONTACT_PERSON)).thenReturn(mrefAttr);
+		when(sampleCollectionsEntityType.getAttribute(BIOBANKS)).thenReturn(mrefAttr);
+		when(sampleCollectionsEntityType.getAttribute(BIOBANK_SAMPLE_ACCESS_FEE)).thenReturn(boolAttr);
+		when(sampleCollectionsEntityType.getAttribute(BIOBANK_SAMPLE_ACCESS_JOINT_PROJECTS)).thenReturn(boolAttr);
+		when(sampleCollectionsEntityType.getAttribute(BIOBANK_SAMPLE_ACCESS_DESCRIPTION)).thenReturn(stringAttr);
+		when(sampleCollectionsEntityType.getAttribute(BIOBANK_DATA_ACCESS_FEE)).thenReturn(boolAttr);
+		when(sampleCollectionsEntityType.getAttribute(BIOBANK_DATA_ACCESS_JOINT_PROJECTS)).thenReturn(boolAttr);
+		when(sampleCollectionsEntityType.getAttribute(BIOBANK_DATA_ACCESS_DESCRIPTION)).thenReturn(stringAttr);
+		when(personEntityType.getAttribute(ID)).thenReturn(stringAttr);
+		when(personEntityType.getAttribute(FIRST_NAME)).thenReturn(stringAttr);
+		when(personEntityType.getAttribute(LAST_NAME)).thenReturn(stringAttr);
+		when(personEntityType.getAttribute(COUNTRY)).thenReturn(xrefAttr);
+		when(personEntityType.getAttribute(PHONE)).thenReturn(stringAttr);
+		when(personEntityType.getAttribute(BbmriNlCheatSheet.EMAIL)).thenReturn(stringAttr);
+		when(personEntityType.getAttribute(BbmriNlCheatSheet.ADDRESS)).thenReturn(stringAttr);
+		when(personEntityType.getAttribute(BbmriNlCheatSheet.ZIP)).thenReturn(stringAttr);
+		when(personEntityType.getAttribute(BbmriNlCheatSheet.CITY)).thenReturn(stringAttr);
+
+		EntityManager entityManager = mock(EntityManager.class);
+		radboudBiobankMapper = new RadboudBiobankMapper(dataService, entityManager);
+		when(entityManager.create(sampleCollectionsEntityType, POPULATE))
+				.thenReturn(new DynamicEntity(sampleCollectionsEntityType));
+		when(entityManager.create(personEntityType, NO_POPULATE)).thenReturn(new DynamicEntity(personEntityType));
+		when(entityManager.create(personEntityType, POPULATE)).thenReturn(new DynamicEntity(personEntityType));
 
 		biobank = Maps.newHashMap();
-		biobank.put(XML_ID,"9000");
-		biobank.put(XML_IDAA,"1");
-		biobank.put(XML_TITLE,"Inflammatoire Darmziekten");
-		biobank.put(XML_DESCRIPTION,"Long description");
-		biobank.put(XML_CONTACT_PERSON,"Dr. Abc de Fgh");
-		biobank.put(XML_ADDRESS1,"afdeling Maag-Darm-Leverziekten");
-		biobank.put(XML_ADDRESS2,"Post 123");
-		biobank.put(XML_ZIP_CODE,"1234 AB");
-		biobank.put(XML_LOCATION,"Poppenwier");
-		biobank.put(XML_EMAIL,"abc@def.gh");
-		biobank.put(XML_PHONE,"123-4567890");
-		biobank.put(XML_TYPEBIOBANK,"1");
-		biobank.put(XML_VOORGESCH,"1");
-		biobank.put(XML_FAMANAM,"1");
-		biobank.put(XML_BEHANDEL,"1");
-		biobank.put(XML_FOLLOWUP,"2");
-		biobank.put(XML_BEELDEN,"1");
-		biobank.put(XML_VRAGENLIJST,"2");
-		biobank.put(XML_OMICS,"2");
-		biobank.put(XML_ROUTINEBEP,"2");
-		biobank.put(XML_GWAS,"2");
-		biobank.put(XML_HISTOPATH,"2");
-		biobank.put(XML_OUTCOME,"2");
-		biobank.put(XML_ANDERS,"2");
+		biobank.put(XML_ID, "9000");
+		biobank.put(XML_IDAA, "1");
+		biobank.put(XML_TITLE, "Inflammatoire Darmziekten");
+		biobank.put(XML_DESCRIPTION, "Long description");
+		biobank.put(XML_CONTACT_PERSON, "Dr. Abc de Fgh");
+		biobank.put(XML_ADDRESS1, "afdeling Maag-Darm-Leverziekten");
+		biobank.put(XML_ADDRESS2, "Post 123");
+		biobank.put(XML_ZIP_CODE, "1234 AB");
+		biobank.put(XML_LOCATION, "Poppenwier");
+		biobank.put(XML_EMAIL, "abc@def.gh");
+		biobank.put(XML_PHONE, "123-4567890");
+		biobank.put(XML_TYPEBIOBANK, "1");
+		biobank.put(XML_VOORGESCH, "1");
+		biobank.put(XML_FAMANAM, "1");
+		biobank.put(XML_BEHANDEL, "1");
+		biobank.put(XML_FOLLOWUP, "2");
+		biobank.put(XML_BEELDEN, "1");
+		biobank.put(XML_VRAGENLIJST, "2");
+		biobank.put(XML_OMICS, "2");
+		biobank.put(XML_ROUTINEBEP, "2");
+		biobank.put(XML_GWAS, "2");
+		biobank.put(XML_HISTOPATH, "2");
+		biobank.put(XML_OUTCOME, "2");
+		biobank.put(XML_ANDERS, "2");
 	}
 
 	@Test
@@ -143,7 +177,8 @@ public class RadboudBiobankMapperTest
 		assertEquals(mappedEntity.get(WEBSITE), "http://www.radboudbiobank.nl/");
 		assertEquals(mappedEntity.get(BIOBANK_DATA_ACCESS_URI), ACCESS_URI);
 
-		Iterator<Entity> investigatorIterator = mappedEntity.getEntities(PRINCIPAL_INVESTIGATORS).iterator();
+		Iterator<Entity> investigatorIterator = mappedEntity.getEntities(BbmriNlCheatSheet.PRINCIPAL_INVESTIGATORS)
+				.iterator();
 		Entity investigator = investigatorIterator.next();
 		assertEquals(investigator.get(ID), "9000_1");
 		assertEquals(investigator.get(COUNTRY), NL_COUNTRY_ENTITY);
@@ -160,7 +195,7 @@ public class RadboudBiobankMapperTest
 	@Test
 	public void mapExistingBiobank()
 	{
-		Entity existingCollection = new DynamicEntity(SAMPLE_COLLECTIONS_METADATA);
+		Entity existingCollection = new DynamicEntity(sampleCollectionsEntityType);
 
 		String url = "http://abc.de/";
 
@@ -169,7 +204,7 @@ public class RadboudBiobankMapperTest
 		existingCollection.set(BIOBANK_SAMPLE_ACCESS_URI, url);
 		existingCollection.set(WEBSITE, url);
 		existingCollection.set(BIOBANK_DATA_ACCESS_URI, url);
-		existingCollection.set(PRINCIPAL_INVESTIGATORS, emptyList());
+		existingCollection.set(BbmriNlCheatSheet.PRINCIPAL_INVESTIGATORS, emptyList());
 		existingCollection.set(INSTITUTES, emptyList());
 
 		Entity mappedEntity = radboudBiobankMapper
@@ -181,7 +216,7 @@ public class RadboudBiobankMapperTest
 		assertEquals(mappedEntity.get(BIOBANK_SAMPLE_ACCESS_URI), url);
 		assertEquals(mappedEntity.get(WEBSITE), url);
 		assertEquals(mappedEntity.get(BIOBANK_DATA_ACCESS_URI), url);
-		assertEquals(mappedEntity.getEntities(PRINCIPAL_INVESTIGATORS), emptyList());
+		assertEquals(mappedEntity.getEntities(BbmriNlCheatSheet.PRINCIPAL_INVESTIGATORS), emptyList());
 		assertEquals(mappedEntity.get(INSTITUTES), emptyList());
 
 		testDynamicMapping(mappedEntity);

@@ -15,6 +15,7 @@ import static com.google.common.hash.Hashing.md5;
 import static java.nio.charset.Charset.forName;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
+import static org.molgenis.data.EntityManager.CreationMode.NO_POPULATE;
 import static org.molgenis.data.EntityManager.CreationMode.POPULATE;
 import static org.molgenis.promise.mapper.RadboudMapper.XML_IDAA;
 import static org.molgenis.promise.mapper.RadboudMapper.getBiobankId;
@@ -94,8 +95,8 @@ class RadboudBiobankMapper
 	 * @param existingSampleCollection a BBMRI Sample Collection entity
 	 * @return a mapped BBMRI Sample Collection entity
 	 */
-	Entity mapExistingBiobank(Map<String, String> radboudBiobankEntity, RadboudSampleMap samples, RadboudDiseaseMap diseases,
-			Entity existingSampleCollection)
+	Entity mapExistingBiobank(Map<String, String> radboudBiobankEntity, RadboudSampleMap samples,
+			RadboudDiseaseMap diseases, Entity existingSampleCollection)
 	{
 		String biobankId = getBiobankId(radboudBiobankEntity);
 
@@ -130,7 +131,7 @@ class RadboudBiobankMapper
 		Entity principalInvestigatorEntity = dataService.findOneById(REF_PERSONS, biobankId);
 		if (principalInvestigatorEntity == null)
 		{
-			principalInvestigatorEntity = entityManager.create(personMetaData, POPULATE);
+			principalInvestigatorEntity = entityManager.create(personMetaData, NO_POPULATE);
 			principalInvestigatorEntity.set(ID, biobankId);
 			principalInvestigatorEntity.set(COUNTRY, countryNl);
 			dataService.add(REF_PERSONS, principalInvestigatorEntity);
