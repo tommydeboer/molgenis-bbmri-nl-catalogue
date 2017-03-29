@@ -20,12 +20,12 @@ public class PromiseMappingProjectMetadata extends SystemEntityType
 	public static final String PROMISE_MAPPING_PROJECT = PACKAGE_PROMISE + PACKAGE_SEPARATOR + SIMPLE_NAME;
 
 	public static final String NAME = "name";
-	public static final String BIOBANK_ID = "biobank_id";
-	public static final String CREDENTIALS = "Credentials";
+	public static final String BIOBANK_ID = "biobankId";
+	public static final String CREDENTIALS = "credentials";
 	public static final String MAPPER = "mapper";
 
 	private final PromisePackage promisePackage;
-	private PromiseCredentialsMetadata promiseCredentialsMetaData;
+	private final PromiseCredentialsMetadata promiseCredentialsMetaData;
 
 	@Autowired
 	public PromiseMappingProjectMetadata(PromisePackage promisePackage,

@@ -29,11 +29,10 @@ class RadboudMapper implements PromiseMapper, ApplicationListener<ContextRefresh
 
 	private final String MAPPER_ID = "RADBOUD";
 
-	private final PromiseMapperFactory promiseMapperFactory;
-	private EntityManager entityManager;
 	private final PromiseDataParser promiseDataParser;
-
 	private final DataService dataService;
+	private final PromiseMapperFactory promiseMapperFactory;
+	private final EntityManager entityManager;
 
 	private int newBiobanks;
 	private int existingBiobanks;
@@ -55,7 +54,7 @@ class RadboudMapper implements PromiseMapper, ApplicationListener<ContextRefresh
 	}
 
 	@Override
-	public void onApplicationEvent(ContextRefreshedEvent arg0)
+	public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent)
 	{
 		promiseMapperFactory.registerMapper(MAPPER_ID, this);
 	}
@@ -126,7 +125,7 @@ class RadboudMapper implements PromiseMapper, ApplicationListener<ContextRefresh
 
 	static String getBiobankId(Map<String, String> radboudEntity)
 	{
-		return radboudEntity.get(XML_ID) + "_" + radboudEntity.get(XML_IDAA);
+		return radboudEntity.get(XML_ID) + '_' + radboudEntity.get(XML_IDAA);
 	}
 
 	/**

@@ -12,8 +12,9 @@ import com.google.common.collect.Maps;
 @Component
 public class PromiseMapperFactory
 {
-	private final Map<String, PromiseMapper> mappers = Maps.newHashMap();
 	private static final Logger LOG = LoggerFactory.getLogger(PromiseMapperFactory.class);
+
+	private final Map<String, PromiseMapper> mappers = Maps.newHashMap();
 
 	@RunAsSystem
 	public void registerMapper(String id, PromiseMapper promiseMapper)

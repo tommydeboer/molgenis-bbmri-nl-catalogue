@@ -12,7 +12,7 @@ import java.util.Map;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.hash.Hashing.md5;
-import static java.nio.charset.Charset.forName;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
 import static org.molgenis.data.EntityManager.CreationMode.NO_POPULATE;
@@ -38,14 +38,14 @@ class RadboudBiobankMapper
 
 	static final String ACCESS_URI = "http://www.radboudbiobank.nl/nl/collecties/materiaal-opvragen/";
 
-	private DataService dataService;
+	private final DataService dataService;
+	private final EntityManager entityManager;
 
 	private Entity countryNl;
 	private Entity ageType;
 	private Entity rbbBiobank;
 	private Entity juristicPerson;
 	private EntityType personMetaData;
-	private EntityManager entityManager;
 
 	RadboudBiobankMapper(DataService dataService, EntityManager entityManager)
 	{
@@ -162,7 +162,7 @@ class RadboudBiobankMapper
 			if (email[i] != null && !email[i].isEmpty()) contentBuilder.append(email[i]);
 			if (phoneNumber != null && !phoneNumber.isEmpty()) contentBuilder.append(phoneNumber);
 
-			String personId = md5().newHasher().putString(contentBuilder, forName("UTF-8")).hash().toString();
+			String personId = md5().newHasher().putString(contentBuilder, UTF_8).hash().toString();
 			Entity person = dataService.findOneById(REF_PERSONS, personId);
 
 			if (person != null)

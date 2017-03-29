@@ -1,7 +1,6 @@
 package org.molgenis.promise.client;
 
 import com.google.common.collect.Maps;
-import org.molgenis.data.Entity;
 import org.molgenis.data.MolgenisDataException;
 import org.molgenis.promise.model.PromiseCredentials;
 import org.slf4j.Logger;
@@ -13,9 +12,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.IOException;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Consumer;
 
+import static java.util.Objects.requireNonNull;
 import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
 import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
 
@@ -29,10 +28,11 @@ public class PromiseDataParser
 	@Autowired
 	public PromiseDataParser(PromiseClient promiseClient)
 	{
-		this.promiseClient = Objects.requireNonNull(promiseClient, "promiseClient is null");
+		this.promiseClient = requireNonNull(promiseClient);
 	}
 
-	public void parse(PromiseCredentials credentials, Integer seqNr, Consumer<Map<String, String>> entityConsumer) throws IOException
+	public void parse(PromiseCredentials credentials, Integer seqNr, Consumer<Map<String, String>> entityConsumer)
+			throws IOException
 	{
 		promiseClient.getData(credentials, seqNr.toString(), reader ->
 		{
