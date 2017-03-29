@@ -48,5 +48,4 @@ public class PromiseConfig
 	{
 		return new PromiseDataUnmarshaller();
 	}
-
 }

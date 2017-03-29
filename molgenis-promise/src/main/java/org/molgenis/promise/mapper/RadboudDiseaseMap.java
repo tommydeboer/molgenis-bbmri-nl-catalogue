@@ -26,7 +26,7 @@ class RadboudDiseaseMap
 	static final String XML_CODEINDEX = "CODEINDEX";
 
 	private Map<String, List<Map<String, String>>> diseases = newHashMap();
-	private DataService dataService;
+	private final DataService dataService;
 
 	private int numberOfDiseaseTypes;
 
@@ -76,5 +76,3 @@ class RadboudDiseaseMap
 		return diseaseTypes;
 	}
 }
-
-
