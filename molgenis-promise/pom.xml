@@ -8,6 +8,11 @@
     </parent>
     <artifactId>molgenis-promise</artifactId>
 
+    <properties>
+        <spring.ws.version>2.1.4.RELEASE</spring.ws.version>
+        <apache.axiom.version>1.2.19</apache.axiom.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.molgenis</groupId>
@@ -27,23 +32,23 @@
         <dependency>
             <groupId>org.springframework.ws</groupId>
             <artifactId>spring-ws-core</artifactId>
-            <version>2.1.4.RELEASE</version>
+            <version>${spring.ws.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.ws</groupId>
             <artifactId>spring-ws-test</artifactId>
-            <version>2.1.4.RELEASE</version>
+            <version>${spring.ws.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-api</artifactId>
-            <version>1.2.19</version>
+            <version>${apache.axiom.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-impl</artifactId>
-            <version>1.2.19</version>
+            <version>${apache.axiom.version}</version>
             <scope>runtime</scope>
         </dependency>
     </dependencies>

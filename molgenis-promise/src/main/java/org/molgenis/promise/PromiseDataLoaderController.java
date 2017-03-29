@@ -1,8 +1,7 @@
 package org.molgenis.promise;
 
-import com.google.common.collect.Lists;
 import org.molgenis.data.DataService;
-import org.molgenis.data.Entity;
+import org.molgenis.data.UnknownEntityException;
 import org.molgenis.promise.mapper.MappingReport;
 import org.molgenis.promise.mapper.PromiseMapper;
 import org.molgenis.promise.mapper.PromiseMapperFactory;
@@ -19,16 +18,18 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
 import static org.molgenis.promise.PromiseDataLoaderController.URI;
 import static org.molgenis.promise.model.PromiseMappingProjectMetadata.PROMISE_MAPPING_PROJECT;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @Controller
 @EnableScheduling
@@ -51,7 +52,7 @@ public class PromiseDataLoaderController extends MolgenisPluginController
 		this.promiseMapperFactory = requireNonNull(promiseMapperFactory);
 	}
 
-	@RequestMapping(method = RequestMethod.GET)
+	@RequestMapping(method = GET)
 	public String init(Model model)
 	{
 		model.addAttribute("promiseMappingProjectEntityTypeId", PROMISE_MAPPING_PROJECT);
@@ -61,26 +62,26 @@ public class PromiseDataLoaderController extends MolgenisPluginController
 	/**
 	 * Returns a list of the project names so they can be listed in the control panel
 	 */
-	@RequestMapping(value = "projects", method = RequestMethod.GET)
+	@RequestMapping(value = "projects", method = GET)
 	@ResponseBody
 	public List<String> projects()
 	{
-		Stream<Entity> projects = dataService.findAll(PROMISE_MAPPING_PROJECT);
-		List<String> names = Lists.newArrayList();
-
-		projects.forEach(p -> names.add(p.getString("name")));
-
-		return names;
+		return dataService.findAll(PROMISE_MAPPING_PROJECT, PromiseMappingProject.class)
+				.map(PromiseMappingProject::getName).collect(toList());
 	}
 
-	@RequestMapping(value = "map/{name}", method = RequestMethod.GET)
+	@RequestMapping(value = "map/{name}", method = GET)
 	@ResponseBody
 	@Transactional
 	public MappingReport map(@PathVariable("name") String projectName) throws IOException
 	{
 		PromiseMappingProject promiseMappingProject = dataService
 				.findOneById(PROMISE_MAPPING_PROJECT, projectName, PromiseMappingProject.class);
-		PromiseMapper promiseMapper = promiseMapperFactory.getMapper(promiseMappingProject.getString("mapper"));
+		if (promiseMappingProject == null)
+		{
+			throw new UnknownEntityException(format("Unknown promise mapping project [%s]", projectName));
+		}
+		PromiseMapper promiseMapper = promiseMapperFactory.getMapper(promiseMappingProject.getMapper());
 		return promiseMapper.map(promiseMappingProject);
 	}
 
@@ -94,7 +95,7 @@ public class PromiseDataLoaderController extends MolgenisPluginController
 				.findAll(PROMISE_MAPPING_PROJECT, PromiseMappingProject.class);
 		promiseMappingProjectStream.forEach(project ->
 		{
-			LOG.info("Starting scheduled mapping task for ProMISe biobank " + project.getString("name"));
+			LOG.info("Starting scheduled mapping task for ProMISe biobank " + project.getName());
 			PromiseMapper promiseMapper = promiseMapperFactory.getMapper(project.getString("mapper"));
 			promiseMapper.map(project);
 		});

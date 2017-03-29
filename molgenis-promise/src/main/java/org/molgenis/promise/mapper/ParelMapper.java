@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -35,15 +36,12 @@ import static org.molgenis.promise.model.BbmriNlCheatSheet.*;
 @Component
 public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRefreshedEvent>
 {
-	private final String MAPPER_ID = "PAREL";
-
-	private PromiseMapperFactory promiseMapperFactory;
-	private PromiseDataParser promiseDataParser;
-	private DataService dataService;
-
 	private static final Logger LOG = LoggerFactory.getLogger(ParelMapper.class);
 
-	private static final HashMap<String, List<String>> materialTypesMap;
+	private final String MAPPER_ID = "PAREL";
+
+	private static final Map<String, List<String>> materialTypesMap;
+
 	private static final List<String> unknownMaterialTypes = newArrayList();
 	private static final List<String> materialTypeIds = newArrayList();
 
@@ -68,7 +66,7 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 		materialTypesMap.put("weefsel", asList("TISSUE_FROZEN", "TISSUE_PARAFFIN_EMBEDDED"));
 	}
 
-	private static final HashMap<String, List<String>> tissueTypesMap;
+	private static final Map<String, List<String>> tissueTypesMap;
 
 	static
 	{
@@ -77,6 +75,10 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 		tissueTypesMap.put("2", singletonList("TISSUE_FROZEN"));
 		tissueTypesMap.put("9", singletonList("OTHER"));
 	}
+
+	private final PromiseMapperFactory promiseMapperFactory;
+	private final PromiseDataParser promiseDataParser;
+	private final DataService dataService;
 
 	@Autowired
 	public ParelMapper(PromiseMapperFactory promiseMapperFactory, PromiseDataParser promiseDataParser,
@@ -88,7 +90,7 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 	}
 
 	@Override
-	public void onApplicationEvent(ContextRefreshedEvent arg0)
+	public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent)
 	{
 		promiseMapperFactory.registerMapper(MAPPER_ID, this);
 	}
@@ -107,7 +109,7 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 
 		try
 		{
-			LOG.info("Getting data from ProMISe for " + promiseMappingProject.getString("name"));
+			LOG.info("Getting data from ProMISe for " + promiseMappingProject.getName());
 			PromiseCredentials promiseCredentials = promiseMappingProject.getPromiseCredentials();
 			EntityType targetEntityMetaData = requireNonNull(dataService.getEntityType(SAMPLE_COLLECTIONS_ENTITY));
 
@@ -117,7 +119,7 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 
 				// find out if a sample collection with this id already exists
 				Entity targetEntity = dataService
-						.findOneById(SAMPLE_COLLECTIONS_ENTITY, promiseMappingProject.getString(BIOBANK_ID));
+						.findOneById(SAMPLE_COLLECTIONS_ENTITY, promiseMappingProject.getBiobankId());
 
 				boolean biobankExists = true;
 				if (targetEntity == null)
@@ -200,8 +202,11 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 			LOG.error("Something went wrong: {}", e);
 		}
 
-		if (!unknownMaterialTypes.isEmpty()) throw new RuntimeException(
-				"Unknown ProMISe material types: [" + String.join(",", unknownMaterialTypes) + "]");
+		if (!unknownMaterialTypes.isEmpty())
+		{
+			throw new RuntimeException(
+					"Unknown ProMISe material types: [" + String.join(",", unknownMaterialTypes) + "]");
+		}
 
 		Iterable<Entity> materialTypes = dataService
 				.findAll(REF_MATERIAL_TYPES, transform(materialTypeIds, id -> (Object) id).stream())
@@ -280,13 +285,25 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 	{
 		if (type.equals("weefsel") && tissue != null)
 		{
-			if (tissueTypesMap.containsKey(tissue)) materialTypeIds.addAll(tissueTypesMap.get(tissue));
-			else unknownMaterialTypes.add(tissue);
+			if (tissueTypesMap.containsKey(tissue))
+			{
+				materialTypeIds.addAll(tissueTypesMap.get(tissue));
+			}
+			else
+			{
+				unknownMaterialTypes.add(tissue);
+			}
 		}
 		else
 		{
-			if (materialTypesMap.containsKey(type)) materialTypeIds.addAll(materialTypesMap.get(type));
-			else unknownMaterialTypes.add(type);
+			if (materialTypesMap.containsKey(type))
+			{
+				materialTypeIds.addAll(materialTypesMap.get(type));
+			}
+			else
+			{
+				unknownMaterialTypes.add(type);
+			}
 		}
 	}
 }
