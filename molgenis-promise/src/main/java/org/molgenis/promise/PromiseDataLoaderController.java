@@ -89,8 +89,7 @@ public class PromiseDataLoaderController extends MolgenisPluginController
 	@RunAsSystem
 	public void executeScheduled()
 	{
-		// TODO make configurable via MOLGENIS 'scheduler'
-
+		// TODO make configurable via MOLGENIS 'scheduler': http://www.molgenis.org/ticket/4207
 		Stream<PromiseMappingProject> promiseMappingProjectStream = dataService
 				.findAll(PROMISE_MAPPING_PROJECT, PromiseMappingProject.class);
 		promiseMappingProjectStream.forEach(project ->
