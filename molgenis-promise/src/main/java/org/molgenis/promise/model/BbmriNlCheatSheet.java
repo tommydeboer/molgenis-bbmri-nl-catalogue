@@ -18,6 +18,9 @@ public class BbmriNlCheatSheet
 	public static final String REF_AGE_TYPES = "bbmri_nl_age_types";
 	public static final String REF_COUNTRIES = "bbmri_nl_countries";
 	public static final String REF_BIOBANKS = "bbmri_nl_biobanks";
+	public static final String REF_SAMPLE_SIZE_TYPES = "bbmri_nl_sample_size_types";
+	public static final String REF_STAFF_SIZE_TYPES = "bbmri_nl_staff_size_types";
+	public static final String REF_PUBLICATIONS = "bbmri_nl_publications";
 
 	// Sample Collections Attributes
 	public static final String BIOBANK_ID = "biobank_id";

@@ -22,14 +22,17 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 	private final DataService dataService;
 	private final UsersGroupsAuthoritiesPopulator usersGroupsAuthoritiesPopulator;
 	private final LanguageFactory languageFactory;
+	private final BbmriUsersGroupsAuthoritiesPopulator bbmriUsersGroupsAuthoritiesPopulator;
 
 	@Autowired
 	public WebAppDatabasePopulatorServiceImpl(DataService dataService,
-			UsersGroupsAuthoritiesPopulator usersGroupsAuthoritiesPopulator, LanguageFactory languageFactory)
+			UsersGroupsAuthoritiesPopulator usersGroupsAuthoritiesPopulator, LanguageFactory languageFactory,
+			BbmriUsersGroupsAuthoritiesPopulator bbmriUsersGroupsAuthoritiesPopulator)
 	{
 		this.dataService = requireNonNull(dataService);
 		this.usersGroupsAuthoritiesPopulator = requireNonNull(usersGroupsAuthoritiesPopulator);
 		this.languageFactory = requireNonNull(languageFactory);
+		this.bbmriUsersGroupsAuthoritiesPopulator = requireNonNull(bbmriUsersGroupsAuthoritiesPopulator);
 	}
 
 	@Override
@@ -38,6 +41,7 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 	public void populateDatabase()
 	{
 		usersGroupsAuthoritiesPopulator.populate();
+		bbmriUsersGroupsAuthoritiesPopulator.populate();
 
 		dataService.add(LANGUAGE, languageFactory
 				.create(LanguageService.DEFAULT_LANGUAGE_CODE, LanguageService.DEFAULT_LANGUAGE_NAME, true));
