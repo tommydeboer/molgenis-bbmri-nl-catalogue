@@ -154,7 +154,7 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 				}
 
 				// map data from ProMISe
-				targetEntity.set(BbmriNlCheatSheet.ID, promiseMappingProject.getString(BIOBANK_ID));
+				targetEntity.set(BbmriNlCheatSheet.ID, promiseMappingProject.getBiobankId());
 				targetEntity.set(TYPE, toTypes(promiseBiobankEntity.get("COLLECTION_TYPE"))); // mref
 				targetEntity.set(MATERIALS, getMaterialTypes(promiseCredentials)); // mref
 				targetEntity.set(SEX, toGenders(promiseBiobankEntity.get("SEX"))); // mref
