@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<molgenis label="OMX" name="omx">
+    <menu label="Home" name="main">
+        <plugin id="home" name="Home" url="home"/>
+        <plugin id="dataexplorer" name="Catalogue" url="dataexplorer"/>
+        <menu label="Data Integration" name="dataintegration">
+            <plugin id="importwizard" name="Upload" url="importwizard"/>
+            <plugin id="fileingest" name="Automatic imports" url="fileingest"/>
+            <plugin id="mappingservice" name="Mapping Service" url="mappingservice"/>
+            <plugin id="sortaservice" name="SORTA" url="sortaservice"/>
+            <plugin id="tagwizard" name="Tag Wizard" url="tagwizard"/>
+            <plugin id="standardsregistry" name="Model registry" url="standardsregistry"/>
+            <plugin id="background" name="Background" url="background"/>
+        </menu>
+        <menu label="Admin" name="admin">
+            <plugin id="promiseloader" name="Promise Loader" url="promiseloader"/>
+            <plugin id="usermanager" name="User Manager" url="usermanager"/>
+            <plugin id="permissionmanager" name="Permission Manager" url="permissionmanager"/>
+            <plugin id="menumanager" name="Menu Manager" url="menumanager"/>
+            <plugin id="thememanager" name="Theme Manager" url="thememanager"/>
+            <plugin id="indexmanager" name="Index manager" url="indexmanager"/>
+            <plugin id="logmanager" name="Log manager" url="logmanager"/>
+            <plugin id="settingsmanager" name="Settings" url="settingsmanager"/>
+        </menu>
+        <plugin id="feedback" name="Feedback" url="feedback"/>
+        <plugin id="useraccount" name="Account" url="useraccount"/>
+    </menu>
+</molgenis>
