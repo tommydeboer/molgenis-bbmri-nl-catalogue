@@ -158,10 +158,11 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 				targetEntity.set(TYPE, toTypes(promiseBiobankEntity.get("COLLECTION_TYPE"))); // mref
 				targetEntity.set(MATERIALS, getMaterialTypes(promiseCredentials)); // mref
 				targetEntity.set(SEX, toGenders(promiseBiobankEntity.get("SEX"))); // mref
-				targetEntity.set(AGE_LOW, promiseBiobankEntity.get("AGE_LOW")); // nillable
-				targetEntity.set(AGE_HIGH, promiseBiobankEntity.get("AGE_HIGH")); // nillable
+				targetEntity.set(AGE_LOW, Integer.valueOf(promiseBiobankEntity.get("AGE_LOW"))); // nillable
+				targetEntity.set(AGE_HIGH, Integer.valueOf(promiseBiobankEntity.get("AGE_HIGH"))); // nillable
 				targetEntity.set(AGE_UNIT, toAgeType(promiseBiobankEntity.get("AGE_UNIT")));
-				targetEntity.set(NUMBER_OF_DONORS, promiseBiobankEntity.get("NUMBER_DONORS")); // nillable
+				targetEntity
+						.set(NUMBER_OF_DONORS, Integer.valueOf(promiseBiobankEntity.get("NUMBER_DONORS"))); // nillable
 
 				if (biobankExists)
 				{
