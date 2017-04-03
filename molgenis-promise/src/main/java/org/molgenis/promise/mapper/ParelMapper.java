@@ -18,15 +18,11 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Lists.transform;
+import static com.google.common.collect.Sets.newHashSet;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
@@ -41,9 +37,6 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 	private final String MAPPER_ID = "PAREL";
 
 	private static final Map<String, List<String>> materialTypesMap;
-
-	private static final List<String> unknownMaterialTypes = newArrayList();
-	private static final List<String> materialTypeIds = newArrayList();
 
 	static
 	{
@@ -191,12 +184,18 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 
 	private Iterable<Entity> getMaterialTypes(PromiseCredentials credentials)
 	{
+		final Set<String> materialTypeIds = newHashSet();
+		final Set<String> unknownMaterialTypes = newHashSet();
 		try
 		{
-			// Parse samples
-			promiseDataParser.parse(credentials, 1,
-					promiseSampleEntity -> toMaterialTypes(promiseSampleEntity.get("MATERIAL_TYPES"),
-							promiseSampleEntity.get("MATERIAL_TYPES_SUB")));
+			promiseDataParser.parse(credentials, 1, promiseSampleEntity ->
+			{
+				RetrievedMaterialTypes retrievedMaterialTypes = toMaterialTypes(
+						promiseSampleEntity.get("MATERIAL_TYPES"), promiseSampleEntity.get("MATERIAL_TYPES_SUB"));
+
+				materialTypeIds.addAll(retrievedMaterialTypes.getMaterialTypeIds());
+				unknownMaterialTypes.addAll(retrievedMaterialTypes.getUnknownMaterialTypes());
+			});
 		}
 		catch (IOException e)
 		{
@@ -210,7 +209,7 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 		}
 
 		Iterable<Entity> materialTypes = dataService
-				.findAll(REF_MATERIAL_TYPES, transform(materialTypeIds, id -> (Object) id).stream())
+				.findAll(REF_MATERIAL_TYPES, materialTypeIds.stream().map(id -> (Object) id))
 				.collect(Collectors.toList());
 
 		if (Iterables.isEmpty(materialTypes))
@@ -282,8 +281,11 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 		return collectionTypes;
 	}
 
-	private void toMaterialTypes(String type, String tissue)
+	private RetrievedMaterialTypes toMaterialTypes(String type, String tissue)
 	{
+		Set<String> unknownMaterialTypes = newHashSet();
+		Set<String> materialTypeIds = newHashSet();
+
 		if (type.equals("weefsel") && tissue != null)
 		{
 			if (tissueTypesMap.containsKey(tissue))
@@ -305,6 +307,31 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 			{
 				unknownMaterialTypes.add(type);
 			}
+		}
+
+		return new RetrievedMaterialTypes(materialTypeIds, unknownMaterialTypes);
+	}
+
+	private class RetrievedMaterialTypes
+	{
+		private Set<String> materialTypeIds;
+		private Set<String> unknownMaterialTypes;
+
+		private RetrievedMaterialTypes(Set<String> materialTypeIds, Set<String> unknownMaterialTypes)
+		{
+
+			this.materialTypeIds = requireNonNull(materialTypeIds);
+			this.unknownMaterialTypes = requireNonNull(unknownMaterialTypes);
+		}
+
+		Set<String> getMaterialTypeIds()
+		{
+			return materialTypeIds;
+		}
+
+		Set<String> getUnknownMaterialTypes()
+		{
+			return unknownMaterialTypes;
 		}
 	}
 }
