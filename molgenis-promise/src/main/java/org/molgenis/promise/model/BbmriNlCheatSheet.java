@@ -44,14 +44,14 @@ public class BbmriNlCheatSheet
 	public static final String INSTITUTES = "institutes";
 	public static final String BIOBANKS = "biobanks";
 	public static final String WEBSITE = "website";
-	public static final String BIOBANK_SAMPLE_ACCESS_FEE = "biobankSampleAccessFee";
-	public static final String BIOBANK_SAMPLE_ACCESS_JOINT_PROJECTS = "biobankSampleAccessJointProjects";
-	public static final String BIOBANK_SAMPLE_ACCESS_DESCRIPTION = "biobankSampleAccessDescription";
-	public static final String BIOBANK_SAMPLE_ACCESS_URI = "biobankSampleAccessURI";
-	public static final String BIOBANK_DATA_ACCESS_FEE = "biobankDataAccessFee";
-	public static final String BIOBANK_DATA_ACCESS_JOINT_PROJECTS = "biobankDataAccessJointProjects";
-	public static final String BIOBANK_DATA_ACCESS_DESCRIPTION = "biobankDataAccessDescription";
-	public static final String BIOBANK_DATA_ACCESS_URI = "biobankDataAccessURI";
+	public static final String BIOBANK_SAMPLE_ACCESS_FEE = "sampleAccessFee";
+	public static final String BIOBANK_SAMPLE_ACCESS_JOINT_PROJECTS = "sampleAccessJointProjects";
+	public static final String BIOBANK_SAMPLE_ACCESS_DESCRIPTION = "sampleAccessDescription";
+	public static final String BIOBANK_SAMPLE_ACCESS_URI = "sampleAccessURI";
+	public static final String BIOBANK_DATA_ACCESS_FEE = "dataAccessFee";
+	public static final String BIOBANK_DATA_ACCESS_JOINT_PROJECTS = "dataAccessJointProjects";
+	public static final String BIOBANK_DATA_ACCESS_DESCRIPTION = "dataAccessDescription";
+	public static final String BIOBANK_DATA_ACCESS_URI = "dataAccessURI";
 
 	// Persons attributes
 	public static final String COUNTRY = "country";
