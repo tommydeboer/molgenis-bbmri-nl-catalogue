@@ -19,7 +19,6 @@ import org.molgenis.security.core.utils.SecurityUtils;
 import org.molgenis.ui.admin.user.UserAccountController;
 import org.molgenis.ui.controller.FeedbackController;
 import org.molgenis.ui.controller.RedirectController;
-import org.molgenis.ui.settings.AppDbSettings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -73,7 +72,7 @@ public class WebAppSystemEntityRegistry implements SystemEntityRegistry
 
 	@Autowired
 	public WebAppSystemEntityRegistry(DataService dataService, UserAuthorityFactory userAuthorityFactory,
-			GroupAuthorityFactory groupAuthorityFactory, GroupFactory groupFactory, AppDbSettings appSettings)
+			GroupAuthorityFactory groupAuthorityFactory, GroupFactory groupFactory)
 	{
 		this.dataService = requireNonNull(dataService);
 		this.userAuthorityFactory = requireNonNull(userAuthorityFactory);
