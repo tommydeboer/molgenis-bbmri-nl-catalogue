@@ -93,19 +93,26 @@ class RadboudMapper implements PromiseMapper, ApplicationListener<ContextRefresh
 				if (!shouldMap(biobankEntity)) return;
 
 				String biobankId = getBiobankId(biobankEntity);
-				Entity bbmriSampleCollection = dataService.findOneById(SAMPLE_COLLECTIONS_ENTITY, biobankId);
-				if (bbmriSampleCollection == null)
+				if (samples.hasSamplesFor(biobankId))
 				{
-					bbmriSampleCollection = biobankMapper.mapNewBiobank(biobankEntity, samples, diseases);
-					dataService.add(SAMPLE_COLLECTIONS_ENTITY, bbmriSampleCollection);
-					newBiobanks++;
+					Entity bbmriSampleCollection = dataService.findOneById(SAMPLE_COLLECTIONS_ENTITY, biobankId);
+					if (bbmriSampleCollection == null)
+					{
+						bbmriSampleCollection = biobankMapper.mapNewBiobank(biobankEntity, samples, diseases);
+						dataService.add(SAMPLE_COLLECTIONS_ENTITY, bbmriSampleCollection);
+						newBiobanks++;
+					}
+					else
+					{
+						bbmriSampleCollection = biobankMapper
+								.mapExistingBiobank(biobankEntity, samples, diseases, bbmriSampleCollection);
+						dataService.update(SAMPLE_COLLECTIONS_ENTITY, bbmriSampleCollection);
+						existingBiobanks++;
+					}
 				}
 				else
 				{
-					bbmriSampleCollection = biobankMapper
-							.mapExistingBiobank(biobankEntity, samples, diseases, bbmriSampleCollection);
-					dataService.update(SAMPLE_COLLECTIONS_ENTITY, bbmriSampleCollection);
-					existingBiobanks++;
+					LOG.warn("No samples found for biobank with id {}", biobankId);
 				}
 			});
 
