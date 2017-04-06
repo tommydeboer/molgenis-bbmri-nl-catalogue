@@ -96,6 +96,11 @@ class RadboudSampleMap
 		return numberOfSamples;
 	}
 
+	boolean hasSamplesFor(String biobankId)
+	{
+		return sampleInfos.containsKey(biobankId);
+	}
+
 	Iterable<Entity> getDataCategories(Map<String, String> radboudBiobankEntity)
 	{
 		String biobankId = getBiobankId(radboudBiobankEntity);

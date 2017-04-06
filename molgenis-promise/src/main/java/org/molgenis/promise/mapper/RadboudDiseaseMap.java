@@ -11,7 +11,7 @@ import java.util.Map;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static java.util.Objects.requireNonNull;
-import static org.molgenis.promise.mapper.RadboudMapper.*;
+import static org.molgenis.promise.mapper.RadboudMapper.XML_IDAA;
 import static org.molgenis.promise.model.BbmriNlCheatSheet.REF_DISEASE_TYPES;
 
 class RadboudDiseaseMap
@@ -55,7 +55,8 @@ class RadboudDiseaseMap
 
 		if (diseaseEntities != null)
 		{
-			diseaseEntities.forEach(disease -> {
+			diseaseEntities.forEach(disease ->
+			{
 				String icd10urn = URN_MIRIAM_ICD_PREFIX + disease.get(XML_CODEINDEX);
 				Entity diseaseType = dataService.findOneById(REF_DISEASE_TYPES, icd10urn);
 				if (diseaseType != null)

@@ -18,15 +18,11 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Lists.transform;
+import static com.google.common.collect.Sets.newHashSet;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
@@ -41,9 +37,6 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 	private final String MAPPER_ID = "PAREL";
 
 	private static final Map<String, List<String>> materialTypesMap;
-
-	private static final List<String> unknownMaterialTypes = newArrayList();
-	private static final List<String> materialTypeIds = newArrayList();
 
 	static
 	{
@@ -127,9 +120,9 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 					targetEntity = new DynamicEntity(targetEntityMetaData);
 
 					// fill hand coded fields with dummy data the first time this biobank is added
-					targetEntity.set(CONTACT_PERSON, singletonList(getTempPerson(REF_PERSONS))); // mref
-					targetEntity.set(PRINCIPAL_INVESTIGATORS, singletonList(getTempPerson(REF_PERSONS))); // mref
-					targetEntity.set(INSTITUTES, singletonList(getTempPerson(REF_JURISTIC_PERSONS))); // mref
+					targetEntity.set(CONTACT_PERSON, singletonList(getTempPerson())); // mref
+					targetEntity.set(PRINCIPAL_INVESTIGATORS, singletonList(getTempPerson())); // mref
+					targetEntity.set(INSTITUTES, singletonList(getTempJuristicPerson())); // mref
 					targetEntity.set(DISEASE, singletonList(getTempDisease())); // mref
 					targetEntity.set(OMICS, singletonList(getTempOmics())); // mref
 					targetEntity.set(DATA_CATEGORIES, singletonList(getTempDataCategories())); // mref
@@ -158,10 +151,11 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 				targetEntity.set(TYPE, toTypes(promiseBiobankEntity.get("COLLECTION_TYPE"))); // mref
 				targetEntity.set(MATERIALS, getMaterialTypes(promiseCredentials)); // mref
 				targetEntity.set(SEX, toGenders(promiseBiobankEntity.get("SEX"))); // mref
-				targetEntity.set(AGE_LOW, promiseBiobankEntity.get("AGE_LOW")); // nillable
-				targetEntity.set(AGE_HIGH, promiseBiobankEntity.get("AGE_HIGH")); // nillable
+				targetEntity.set(AGE_LOW, Integer.valueOf(promiseBiobankEntity.get("AGE_LOW"))); // nillable
+				targetEntity.set(AGE_HIGH, Integer.valueOf(promiseBiobankEntity.get("AGE_HIGH"))); // nillable
 				targetEntity.set(AGE_UNIT, toAgeType(promiseBiobankEntity.get("AGE_UNIT")));
-				targetEntity.set(NUMBER_OF_DONORS, promiseBiobankEntity.get("NUMBER_DONORS")); // nillable
+				targetEntity
+						.set(NUMBER_OF_DONORS, Integer.valueOf(promiseBiobankEntity.get("NUMBER_DONORS"))); // nillable
 
 				if (biobankExists)
 				{
@@ -190,12 +184,18 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 
 	private Iterable<Entity> getMaterialTypes(PromiseCredentials credentials)
 	{
+		final Set<String> materialTypeIds = newHashSet();
+		final Set<String> unknownMaterialTypes = newHashSet();
 		try
 		{
-			// Parse samples
-			promiseDataParser.parse(credentials, 1,
-					promiseSampleEntity -> toMaterialTypes(promiseSampleEntity.get("MATERIAL_TYPES"),
-							promiseSampleEntity.get("MATERIAL_TYPES_SUB")));
+			promiseDataParser.parse(credentials, 1, promiseSampleEntity ->
+			{
+				RetrievedMaterialTypes retrievedMaterialTypes = toMaterialTypes(
+						promiseSampleEntity.get("MATERIAL_TYPES"), promiseSampleEntity.get("MATERIAL_TYPES_SUB"));
+
+				materialTypeIds.addAll(retrievedMaterialTypes.getMaterialTypeIds());
+				unknownMaterialTypes.addAll(retrievedMaterialTypes.getUnknownMaterialTypes());
+			});
 		}
 		catch (IOException e)
 		{
@@ -209,7 +209,7 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 		}
 
 		Iterable<Entity> materialTypes = dataService
-				.findAll(REF_MATERIAL_TYPES, transform(materialTypeIds, id -> (Object) id).stream())
+				.findAll(REF_MATERIAL_TYPES, materialTypeIds.stream().map(id -> (Object) id))
 				.collect(Collectors.toList());
 
 		if (Iterables.isEmpty(materialTypes))
@@ -232,18 +232,35 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 		return dataService.findOneById(REF_DISEASE_TYPES, "NI");
 	}
 
-	private Entity getTempPerson(String targetRefEntity)
+	private Entity getTempPerson()
 	{
-		Entity person = dataService.findOneById(targetRefEntity, "Unknown");
+		Entity person = dataService.findOneById(REF_PERSONS, "Unknown");
 		if (person == null)
 		{
-			EntityType personsMetaData = requireNonNull(dataService.getEntityType(targetRefEntity));
+			EntityType personsMetaData = requireNonNull(dataService.getEntityType(REF_PERSONS));
+			person = new DynamicEntity(personsMetaData);
+
+			person.set("id", "Unknown");
+			person.set("last_name", "Unknown");
+			person.set("country", dataService.findOneById(REF_COUNTRIES, "NL"));
+			dataService.add(REF_PERSONS, person);
+		}
+
+		return person;
+	}
+
+	private Entity getTempJuristicPerson()
+	{
+		Entity person = dataService.findOneById(REF_JURISTIC_PERSONS, "Unknown");
+		if (person == null)
+		{
+			EntityType personsMetaData = requireNonNull(dataService.getEntityType(REF_JURISTIC_PERSONS));
 			person = new DynamicEntity(personsMetaData);
 
 			person.set("id", "Unknown");
 			person.set("name", "Unknown");
 			person.set("country", dataService.findOneById(REF_COUNTRIES, "NL"));
-			dataService.add(targetRefEntity, person);
+			dataService.add(REF_JURISTIC_PERSONS, person);
 		}
 
 		return person;
@@ -281,8 +298,11 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 		return collectionTypes;
 	}
 
-	private void toMaterialTypes(String type, String tissue)
+	private RetrievedMaterialTypes toMaterialTypes(String type, String tissue)
 	{
+		Set<String> unknownMaterialTypes = newHashSet();
+		Set<String> materialTypeIds = newHashSet();
+
 		if (type.equals("weefsel") && tissue != null)
 		{
 			if (tissueTypesMap.containsKey(tissue))
@@ -304,6 +324,31 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 			{
 				unknownMaterialTypes.add(type);
 			}
+		}
+
+		return new RetrievedMaterialTypes(materialTypeIds, unknownMaterialTypes);
+	}
+
+	private class RetrievedMaterialTypes
+	{
+		private Set<String> materialTypeIds;
+		private Set<String> unknownMaterialTypes;
+
+		private RetrievedMaterialTypes(Set<String> materialTypeIds, Set<String> unknownMaterialTypes)
+		{
+
+			this.materialTypeIds = requireNonNull(materialTypeIds);
+			this.unknownMaterialTypes = requireNonNull(unknownMaterialTypes);
+		}
+
+		Set<String> getMaterialTypeIds()
+		{
+			return materialTypeIds;
+		}
+
+		Set<String> getUnknownMaterialTypes()
+		{
+			return unknownMaterialTypes;
 		}
 	}
 }
