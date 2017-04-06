@@ -120,9 +120,9 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 					targetEntity = new DynamicEntity(targetEntityMetaData);
 
 					// fill hand coded fields with dummy data the first time this biobank is added
-					targetEntity.set(CONTACT_PERSON, singletonList(getTempPerson(REF_PERSONS))); // mref
-					targetEntity.set(PRINCIPAL_INVESTIGATORS, singletonList(getTempPerson(REF_PERSONS))); // mref
-					targetEntity.set(INSTITUTES, singletonList(getTempPerson(REF_JURISTIC_PERSONS))); // mref
+					targetEntity.set(CONTACT_PERSON, singletonList(getTempPerson())); // mref
+					targetEntity.set(PRINCIPAL_INVESTIGATORS, singletonList(getTempPerson())); // mref
+					targetEntity.set(INSTITUTES, singletonList(getTempJuristicPerson())); // mref
 					targetEntity.set(DISEASE, singletonList(getTempDisease())); // mref
 					targetEntity.set(OMICS, singletonList(getTempOmics())); // mref
 					targetEntity.set(DATA_CATEGORIES, singletonList(getTempDataCategories())); // mref
@@ -232,18 +232,35 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 		return dataService.findOneById(REF_DISEASE_TYPES, "NI");
 	}
 
-	private Entity getTempPerson(String targetRefEntity)
+	private Entity getTempPerson()
 	{
-		Entity person = dataService.findOneById(targetRefEntity, "Unknown");
+		Entity person = dataService.findOneById(REF_PERSONS, "Unknown");
 		if (person == null)
 		{
-			EntityType personsMetaData = requireNonNull(dataService.getEntityType(targetRefEntity));
+			EntityType personsMetaData = requireNonNull(dataService.getEntityType(REF_PERSONS));
+			person = new DynamicEntity(personsMetaData);
+
+			person.set("id", "Unknown");
+			person.set("last_name", "Unknown");
+			person.set("country", dataService.findOneById(REF_COUNTRIES, "NL"));
+			dataService.add(REF_PERSONS, person);
+		}
+
+		return person;
+	}
+
+	private Entity getTempJuristicPerson()
+	{
+		Entity person = dataService.findOneById(REF_JURISTIC_PERSONS, "Unknown");
+		if (person == null)
+		{
+			EntityType personsMetaData = requireNonNull(dataService.getEntityType(REF_JURISTIC_PERSONS));
 			person = new DynamicEntity(personsMetaData);
 
 			person.set("id", "Unknown");
 			person.set("name", "Unknown");
 			person.set("country", dataService.findOneById(REF_COUNTRIES, "NL"));
-			dataService.add(targetRefEntity, person);
+			dataService.add(REF_JURISTIC_PERSONS, person);
 		}
 
 		return person;
