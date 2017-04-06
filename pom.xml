@@ -9,7 +9,7 @@
     </parent>
     <groupId>org.molgenis</groupId>
     <artifactId>molgenis-bbmri-nl-catalogue</artifactId>
-    <version>2.1.0-BBMRI-NL-CATALOGUE-SNAPSHOT</version>
+    <version>2.1.0-BBMRI-NL-CATALOGUE</version>
     <packaging>pom</packaging>
 
     <!-- More Project Information -->
