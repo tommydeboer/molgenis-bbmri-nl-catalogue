@@ -109,9 +109,14 @@ public class RadboudBiobankMapperTest
 		when(sampleCollectionsEntityType.getAttribute(INSTITUTES)).thenReturn(institutesAttr);
 		when(sampleCollectionsEntityType.getAttribute(NAME)).thenReturn(stringAttr);
 		when(sampleCollectionsEntityType.getAttribute(TYPE)).thenReturn(mrefAttr);
+		when(sampleCollectionsEntityType.getAttribute(DATA_CATEGORIES)).thenReturn(mrefAttr);
+		when(sampleCollectionsEntityType.getAttribute(MATERIALS)).thenReturn(mrefAttr);
+		when(sampleCollectionsEntityType.getAttribute(OMICS)).thenReturn(mrefAttr);
+		when(sampleCollectionsEntityType.getAttribute(SEX)).thenReturn(mrefAttr);
 		when(sampleCollectionsEntityType.getAttribute(AGE_UNIT)).thenReturn(xrefAttr);
 		when(sampleCollectionsEntityType.getAttribute(AGE_LOW)).thenReturn(intAttr);
 		when(sampleCollectionsEntityType.getAttribute(AGE_HIGH)).thenReturn(intAttr);
+		when(sampleCollectionsEntityType.getAttribute(DISEASE)).thenReturn(mrefAttr);
 		when(sampleCollectionsEntityType.getAttribute(NUMBER_OF_DONORS)).thenReturn(intAttr);
 		when(sampleCollectionsEntityType.getAttribute(DESCRIPTION)).thenReturn(stringAttr);
 		when(sampleCollectionsEntityType.getAttribute(CONTACT_PERSON)).thenReturn(mrefAttr);
