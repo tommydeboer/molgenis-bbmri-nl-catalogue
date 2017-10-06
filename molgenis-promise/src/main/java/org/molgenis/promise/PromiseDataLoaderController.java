@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -73,7 +72,7 @@ public class PromiseDataLoaderController extends MolgenisPluginController
 	@RequestMapping(value = "map/{name}", method = GET)
 	@ResponseBody
 	@Transactional
-	public MappingReport map(@PathVariable("name") String projectName) throws IOException
+	public MappingReport map(@PathVariable("name") String projectName)
 	{
 		PromiseMappingProject promiseMappingProject = dataService
 				.findOneById(PROMISE_MAPPING_PROJECT, projectName, PromiseMappingProject.class);

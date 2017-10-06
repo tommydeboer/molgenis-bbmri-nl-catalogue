@@ -1,13 +1,12 @@
 package org.molgenis.promise.mapper;
 
-import java.util.Map;
-
+import com.google.common.collect.Maps;
 import org.molgenis.security.core.runas.RunAsSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.Maps;
+import java.util.Map;
 
 @Component
 public class PromiseMapperFactory
@@ -17,7 +16,7 @@ public class PromiseMapperFactory
 	private final Map<String, PromiseMapper> mappers = Maps.newHashMap();
 
 	@RunAsSystem
-	public void registerMapper(String id, PromiseMapper promiseMapper)
+	void registerMapper(String id, PromiseMapper promiseMapper)
 	{
 		LOG.info("Registering ProMISe mapper [{}].", id);
 		mappers.put(id, promiseMapper);
