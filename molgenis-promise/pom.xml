@@ -51,5 +51,10 @@
             <version>${apache.axiom.version}</version>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>org.molgenis</groupId>
+            <artifactId>molgenis-jobs</artifactId>
+            <version>${molgenis.version}</version>
+        </dependency>
     </dependencies>
 </project>
