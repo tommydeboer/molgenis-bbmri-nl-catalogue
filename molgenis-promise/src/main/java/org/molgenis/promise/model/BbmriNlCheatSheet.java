@@ -5,6 +5,10 @@ package org.molgenis.promise.model;
  */
 public class BbmriNlCheatSheet
 {
+	private BbmriNlCheatSheet()
+	{
+	}
+
 	// Entities
 	public static final String SAMPLE_COLLECTIONS_ENTITY = "bbmri_nl_sample_collections";
 	public static final String REF_COLLECTION_TYPES = "bbmri_nl_collection_types";
@@ -23,7 +27,6 @@ public class BbmriNlCheatSheet
 	public static final String REF_PUBLICATIONS = "bbmri_nl_publications";
 
 	// Sample Collections Attributes
-	public static final String BIOBANK_ID = "biobank_id";
 	public static final String ID = "id";
 	public static final String NAME = "name";
 	public static final String ACRONYM = "acronym";

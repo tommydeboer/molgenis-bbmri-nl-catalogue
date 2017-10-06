@@ -27,7 +27,7 @@ class RadboudMapper implements PromiseMapper, ApplicationListener<ContextRefresh
 	static final String XML_ID = "ID";
 	static final String XML_IDAA = "IDAA";
 
-	private final String MAPPER_ID = "RADBOUD";
+	private static final String MAPPER_ID = "RADBOUD";
 
 	private final PromiseDataParser promiseDataParser;
 	private final DataService dataService;
@@ -104,8 +104,8 @@ class RadboudMapper implements PromiseMapper, ApplicationListener<ContextRefresh
 					}
 					else
 					{
-						bbmriSampleCollection = biobankMapper
-								.mapExistingBiobank(biobankEntity, samples, diseases, bbmriSampleCollection);
+						bbmriSampleCollection = biobankMapper.mapExistingBiobank(biobankEntity, samples, diseases,
+								bbmriSampleCollection);
 						dataService.update(SAMPLE_COLLECTIONS_ENTITY, bbmriSampleCollection);
 						existingBiobanks++;
 					}

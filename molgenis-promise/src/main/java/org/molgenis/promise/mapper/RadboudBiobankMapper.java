@@ -3,6 +3,7 @@ package org.molgenis.promise.mapper;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
 import org.molgenis.data.EntityManager;
+import org.molgenis.data.MolgenisDataException;
 import org.molgenis.data.meta.model.EntityType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.hash.Hashing.md5;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -154,13 +156,13 @@ class RadboudBiobankMapper
 		for (int i = 0; i < contactPerson.length; i++)
 		{
 			StringBuilder contentBuilder = new StringBuilder();
-			if (contactPerson[i] != null && !contactPerson[i].isEmpty()) contentBuilder.append(contactPerson[i]);
-			if (address1 != null && !address1.isEmpty()) contentBuilder.append(address1);
-			if (address2 != null && !address2.isEmpty()) contentBuilder.append(address2);
-			if (postalCode != null && !postalCode.isEmpty()) contentBuilder.append(postalCode);
-			if (city != null && !city.isEmpty()) contentBuilder.append(city);
-			if (email[i] != null && !email[i].isEmpty()) contentBuilder.append(email[i]);
-			if (phoneNumber != null && !phoneNumber.isEmpty()) contentBuilder.append(phoneNumber);
+			appendContent(contentBuilder, contactPerson[i]);
+			appendContent(contentBuilder, address1);
+			appendContent(contentBuilder, address2);
+			appendContent(contentBuilder, postalCode);
+			appendContent(contentBuilder, city);
+			appendContent(contentBuilder, email[i]);
+			appendContent(contentBuilder, phoneNumber);
 
 			String personId = md5().newHasher().putString(contentBuilder, UTF_8).hash().toString();
 			Entity person = dataService.findOneById(REF_PERSONS, personId);
@@ -179,10 +181,10 @@ class RadboudBiobankMapper
 				newPerson.set(EMAIL, email[i]);
 
 				StringBuilder addressBuilder = new StringBuilder();
-				if (address1 != null && !address1.isEmpty()) addressBuilder.append(address1);
-				if (address2 != null && !address2.isEmpty())
+				appendContent(addressBuilder, address1);
+				if (!isNullOrEmpty(address2))
 				{
-					if (address1 != null && !address1.isEmpty()) addressBuilder.append(' ');
+					if (!isNullOrEmpty(address1)) addressBuilder.append(' ');
 					addressBuilder.append(address2);
 				}
 				if (addressBuilder.length() > 0)
@@ -199,6 +201,14 @@ class RadboudBiobankMapper
 
 		}
 		return persons;
+	}
+
+	private static void appendContent(StringBuilder contentBuilder, String content)
+	{
+		if (!isNullOrEmpty(content))
+		{
+			contentBuilder.append(content);
+		}
 	}
 
 	private Iterable<Entity> getTypes(String radboudTypeBiobank)
@@ -222,13 +232,13 @@ class RadboudBiobankMapper
 					collectionTypeId = "POPULATION_BASED";
 					break;
 				default:
-					throw new RuntimeException("Unknown biobank type [" + radboudTypeBiobank + "]");
+					throw new MolgenisDataException("Unknown biobank type [" + radboudTypeBiobank + "]");
 			}
 		}
 		Entity collectionType = dataService.findOneById(REF_COLLECTION_TYPES, collectionTypeId);
 		if (collectionType == null)
 		{
-			throw new RuntimeException("Unknown '" + REF_COLLECTION_TYPES + "' [" + collectionTypeId + "]");
+			throw new MolgenisDataException("Unknown '" + REF_COLLECTION_TYPES + "' [" + collectionTypeId + "]");
 		}
 		return singletonList(collectionType);
 	}

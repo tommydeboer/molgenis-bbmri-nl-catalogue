@@ -2,6 +2,7 @@ package org.molgenis.promise.mapper;
 
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
+import org.molgenis.data.MolgenisDataException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -188,7 +189,7 @@ class RadboudSampleMap
 		return getTypeEntities(REF_EXP_DATA_TYPES, sampleInfos.get(biobankId).getOmicsIds());
 	}
 
-	Iterable<Entity> getSex(String biobankId) throws RuntimeException
+	Iterable<Entity> getSex(String biobankId)
 	{
 		return getTypeEntities(REF_SEX_TYPES, sampleInfos.get(biobankId).getSexIds());
 	}
@@ -233,7 +234,7 @@ class RadboudSampleMap
 		Iterable<Entity> typeEntities = dataService.findAll(typeEntity, typeIds.stream()).collect(toList());
 		if (!typeIds.iterator().hasNext())
 		{
-			throw new RuntimeException("Unknown '" + typeEntity + "' [" + join(typeIds, ',') + "]");
+			throw new MolgenisDataException("Unknown '" + typeEntity + "' [" + join(typeIds, ',') + "]");
 		}
 		return typeEntities;
 	}
@@ -292,12 +293,10 @@ class RadboudSampleMap
 		}
 
 		if ("1".equals(radboudSampleEntity.get(XML_GASTROINTMUC)) || "1".equals(radboudSampleEntity.get(XML_LIQUOR))
-				|| "1".equals(radboudSampleEntity.get(XML_CELLBEENMERG)) || "1"
-				.equals(radboudSampleEntity.get(XML_MONONUCLBLOED)) || "1"
-				.equals(radboudSampleEntity.get(XML_MONONUCMERG)) || "1"
-				.equals(radboudSampleEntity.get(XML_GRANULOCYTMERG)) || "1"
-				.equals(radboudSampleEntity.get(XML_MONOCYTMERG)) || "1"
-				.equals(radboudSampleEntity.get(XML_MICROBIOOM)))
+				|| "1".equals(radboudSampleEntity.get(XML_CELLBEENMERG)) || "1".equals(
+				radboudSampleEntity.get(XML_MONONUCLBLOED)) || "1".equals(radboudSampleEntity.get(XML_MONONUCMERG))
+				|| "1".equals(radboudSampleEntity.get(XML_GRANULOCYTMERG)) || "1".equals(
+				radboudSampleEntity.get(XML_MONOCYTMERG)) || "1".equals(radboudSampleEntity.get(XML_MICROBIOOM)))
 		{
 			materialTypeIds.add("OTHER");
 		}
