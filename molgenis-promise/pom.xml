@@ -105,5 +105,10 @@
             <version>${molgenis.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.molgenis</groupId>
+            <artifactId>molgenis-jobs</artifactId>
+            <version>${molgenis.version}</version>
+        </dependency>
     </dependencies>
 </project>
