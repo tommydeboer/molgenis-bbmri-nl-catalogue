@@ -2,9 +2,12 @@ package org.molgenis.promise.job;
 
 import org.molgenis.data.jobs.model.JobExecutionMetaData;
 import org.molgenis.data.jobs.model.JobPackage;
+import org.molgenis.data.meta.AttributeType;
 import org.molgenis.data.meta.SystemEntityType;
+import org.molgenis.promise.PromiseMapperType;
 import org.springframework.stereotype.Component;
 
+import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
 import static org.molgenis.data.jobs.model.JobPackage.PACKAGE_JOB;
 import static org.molgenis.data.meta.model.Package.PACKAGE_SEPARATOR;
@@ -41,6 +44,10 @@ public class PromiseJobExecutionMetadata extends SystemEntityType
 		addAttribute(CREDENTIALS).setLabel("Credentials Entity")
 								 .setNillable(false)
 								 .setDescription("The identifier of the PromiseCredentials entity to use.");
-		addAttribute(MAPPER).setLabel("Mapper Type").setNillable(false);
+		addAttribute(MAPPER).setLabel("Mapper Type")
+							.setDataType(AttributeType.ENUM)
+							.setEnumOptions(
+									asList(PromiseMapperType.PAREL.toString(), PromiseMapperType.RADBOUD.toString()))
+							.setNillable(false);
 	}
 }
