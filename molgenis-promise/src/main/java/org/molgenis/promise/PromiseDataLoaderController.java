@@ -3,7 +3,6 @@ package org.molgenis.promise;
 import org.molgenis.data.DataService;
 import org.molgenis.data.UnknownEntityException;
 import org.molgenis.promise.mapper.MappingReport;
-import org.molgenis.promise.mapper.PromiseMapper;
 import org.molgenis.promise.mapper.PromiseMapperFactory;
 import org.molgenis.promise.model.PromiseMappingProject;
 import org.molgenis.security.core.runas.RunAsSystem;
@@ -81,7 +80,7 @@ public class PromiseDataLoaderController extends PluginController
 		{
 			throw new UnknownEntityException(format("Unknown promise mapping project [%s]", projectName));
 		}
-		PromiseMapper promiseMapper = promiseMapperFactory.getMapper(promiseMappingProject.getMapper());
+		//		PromiseMapper promiseMapper = promiseMapperFactory.getMapper(promiseMappingProject.getMapper());
 		//		return promiseMapper.map(promiseMappingProject);
 		return null;
 	}
@@ -96,7 +95,7 @@ public class PromiseDataLoaderController extends PluginController
 		promiseMappingProjectStream.forEach(project ->
 		{
 			LOG.info("Starting scheduled mapping task for ProMISe biobank " + project.getName());
-			PromiseMapper promiseMapper = promiseMapperFactory.getMapper(project.getString("mapper"));
+			//			PromiseMapper promiseMapper = promiseMapperFactory.getMapper(project.getString("mapper"));
 			//			promiseMapper.map(project);
 		});
 	}

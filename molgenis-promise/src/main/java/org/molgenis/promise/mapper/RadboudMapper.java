@@ -4,6 +4,7 @@ import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
 import org.molgenis.data.EntityManager;
 import org.molgenis.data.jobs.Progress;
+import org.molgenis.promise.PromiseMapperType;
 import org.molgenis.promise.client.PromiseDataParser;
 import org.molgenis.promise.mapper.MappingReport.Status;
 import org.molgenis.promise.model.PromiseCredentials;
@@ -27,8 +28,6 @@ class RadboudMapper implements PromiseMapper, ApplicationListener<ContextRefresh
 	static final String XML_ID = "ID";
 	static final String XML_IDAA = "IDAA";
 
-	private static final String MAPPER_ID = "RADBOUD";
-
 	private final PromiseDataParser promiseDataParser;
 	private final DataService dataService;
 	private final PromiseMapperFactory promiseMapperFactory;
@@ -48,15 +47,9 @@ class RadboudMapper implements PromiseMapper, ApplicationListener<ContextRefresh
 	}
 
 	@Override
-	public String getId()
-	{
-		return MAPPER_ID;
-	}
-
-	@Override
 	public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent)
 	{
-		promiseMapperFactory.registerMapper(MAPPER_ID, this);
+		promiseMapperFactory.registerMapper(PromiseMapperType.RADBOUD, this);
 	}
 
 	@Override

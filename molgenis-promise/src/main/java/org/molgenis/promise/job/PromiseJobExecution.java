@@ -3,6 +3,7 @@ package org.molgenis.promise.job;
 import org.molgenis.data.Entity;
 import org.molgenis.data.jobs.model.JobExecution;
 import org.molgenis.data.meta.model.EntityType;
+import org.molgenis.promise.PromiseMapperType;
 
 import static org.molgenis.promise.job.PromiseJobExecutionMetadata.*;
 
@@ -47,13 +48,13 @@ public class PromiseJobExecution extends JobExecution
 		set(CREDENTIALS, credentials);
 	}
 
-	public String getMapper()
+	public PromiseMapperType getMapper()
 	{
-		return getString(MAPPER);
+		return PromiseMapperType.valueOf(getString(MAPPER));
 	}
 
-	public void setMapper(String mapper)
+	public void setMapper(PromiseMapperType mapper)
 	{
-		set(MAPPER, mapper);
+		set(MAPPER, mapper.toString());
 	}
 }

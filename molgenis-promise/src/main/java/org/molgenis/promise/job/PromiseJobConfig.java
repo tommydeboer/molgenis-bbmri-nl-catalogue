@@ -7,6 +7,7 @@ import org.molgenis.data.jobs.Job;
 import org.molgenis.data.jobs.JobFactory;
 import org.molgenis.data.jobs.model.ScheduledJobType;
 import org.molgenis.data.jobs.model.ScheduledJobTypeFactory;
+import org.molgenis.promise.PromiseMapperType;
 import org.molgenis.promise.mapper.PromiseMapper;
 import org.molgenis.promise.mapper.PromiseMapperFactory;
 import org.molgenis.promise.model.PromiseCredentials;
@@ -16,6 +17,8 @@ import org.springframework.context.annotation.Lazy;
 
 import static com.google.common.collect.ImmutableMap.of;
 import static java.util.Objects.requireNonNull;
+import static org.molgenis.promise.PromiseMapperType.PAREL;
+import static org.molgenis.promise.PromiseMapperType.RADBOUD;
 import static org.molgenis.promise.model.PromiseCredentialsMetadata.PROMISE_CREDENTIALS;
 
 @SuppressWarnings("SpringJavaAutowiringInspection")
@@ -48,7 +51,7 @@ public class PromiseJobConfig
 			public Job createJob(PromiseJobExecution promiseJobExecution)
 			{
 				final String biobankId = promiseJobExecution.getBiobankId();
-				final String mapperType = promiseJobExecution.getMapper();
+				final PromiseMapperType mapperType = promiseJobExecution.getMapper();
 				PromiseCredentials credentials = dataService.findOneById(PROMISE_CREDENTIALS,
 						promiseJobExecution.getCredentials(), PromiseCredentials.class);
 				PromiseMapper mapper = promiseMapperFactory.getMapper(mapperType);
@@ -67,7 +70,8 @@ public class PromiseJobConfig
 		result.setDescription("testtestests");
 		result.setSchema(gson.toJson(of("title", "Promise Job", "type", "object", "properties",
 				of("biobankId", of("type", "string", "description", "The identifier of the target biobank."), "mapper",
-						of("type", "string", "description", "The Promise Mapper Type to use."), "credentials",
+						of("type", "string", "description", "The Promise Mapper Type to use.", "enum",
+								ImmutableList.of(PAREL, RADBOUD)), "credentials",
 						of("type", "string", "description", "The identifier of the PromiseCredentials entity to use")),
 				"required", ImmutableList.of("biobankId", "mapper", "biobankId"))));
 		result.setJobExecutionType(promiseJobExecutionMetadata);
