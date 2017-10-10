@@ -82,7 +82,8 @@ public class PromiseDataLoaderController extends PluginController
 			throw new UnknownEntityException(format("Unknown promise mapping project [%s]", projectName));
 		}
 		PromiseMapper promiseMapper = promiseMapperFactory.getMapper(promiseMappingProject.getMapper());
-		return promiseMapper.map(promiseMappingProject);
+		//		return promiseMapper.map(promiseMappingProject);
+		return null;
 	}
 
 	@Scheduled(cron = "0 0 0 * * *")
@@ -96,7 +97,7 @@ public class PromiseDataLoaderController extends PluginController
 		{
 			LOG.info("Starting scheduled mapping task for ProMISe biobank " + project.getName());
 			PromiseMapper promiseMapper = promiseMapperFactory.getMapper(project.getString("mapper"));
-			promiseMapper.map(project);
+			//			promiseMapper.map(project);
 		});
 	}
 }

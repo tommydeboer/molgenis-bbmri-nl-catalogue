@@ -3,7 +3,6 @@ package org.molgenis.promise.job;
 import org.molgenis.data.Entity;
 import org.molgenis.data.jobs.model.JobExecution;
 import org.molgenis.data.meta.model.EntityType;
-import org.molgenis.promise.model.PromiseCredentials;
 
 import static org.molgenis.promise.job.PromiseJobExecutionMetadata.*;
 
@@ -38,23 +37,23 @@ public class PromiseJobExecution extends JobExecution
 		set(BIOBANK_ID, biobankId);
 	}
 
-	public PromiseCredentials getCredentials()
+	public String getCredentials()
 	{
-		return getEntity(CREDENTIALS, PromiseCredentials.class);
+		return getString(CREDENTIALS);
 	}
 
-	public void setCredentials(PromiseCredentials credentials)
+	public void setCredentials(String credentials)
 	{
 		set(CREDENTIALS, credentials);
 	}
 
-	public String getMapperType()
+	public String getMapper()
 	{
 		return getString(MAPPER);
 	}
 
-	public void setMapperType(String mapperType)
+	public void setMapper(String mapper)
 	{
-		set(MAPPER, mapperType);
+		set(MAPPER, mapper);
 	}
 }
