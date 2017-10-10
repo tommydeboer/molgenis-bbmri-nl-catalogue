@@ -3,10 +3,10 @@ package org.molgenis.promise.mapper;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
 import org.molgenis.data.EntityManager;
+import org.molgenis.data.jobs.Progress;
 import org.molgenis.promise.client.PromiseDataParser;
 import org.molgenis.promise.mapper.MappingReport.Status;
 import org.molgenis.promise.model.PromiseCredentials;
-import org.molgenis.promise.model.PromiseMappingProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,9 +60,9 @@ class RadboudMapper implements PromiseMapper, ApplicationListener<ContextRefresh
 	}
 
 	@Override
-	public MappingReport map(PromiseMappingProject promiseMappingProject)
+	public MappingReport map(Progress progress, PromiseCredentials promiseCredentials, String unusedBiobankId)
 	{
-		requireNonNull(promiseMappingProject);
+		//		requireNonNull(promiseMappingProject);
 
 		MappingReport report = new MappingReport();
 
@@ -72,23 +72,21 @@ class RadboudMapper implements PromiseMapper, ApplicationListener<ContextRefresh
 			RadboudDiseaseMap diseases = new RadboudDiseaseMap(dataService);
 			RadboudBiobankMapper biobankMapper = new RadboudBiobankMapper(dataService, entityManager);
 
-			PromiseCredentials credentials = promiseMappingProject.getPromiseCredentials();
-
 			LOG.info("Reading RADBOUD samples");
-			promiseDataParser.parse(credentials, 1, sampleEntity ->
+			promiseDataParser.parse(promiseCredentials, 1, sampleEntity ->
 			{
 				if (shouldMap(sampleEntity)) samples.addSample(sampleEntity);
 			});
 			LOG.info("Processed {} RADBOUD samples", samples.getNumberOfSamples());
 
 			LOG.info("Reading RADBOUD disease types");
-			promiseDataParser.parse(credentials, 2, diseases::addDisease);
+			promiseDataParser.parse(promiseCredentials, 2, diseases::addDisease);
 			LOG.info("Processed {} RADBOUD disease types", diseases.getNumberOfDiseaseTypes());
 
 			LOG.info("Mapping RADBOUD biobanks");
 			newBiobanks = 0;
 			existingBiobanks = 0;
-			promiseDataParser.parse(credentials, 0, biobankEntity ->
+			promiseDataParser.parse(promiseCredentials, 0, biobankEntity ->
 			{
 				if (!shouldMap(biobankEntity)) return;
 

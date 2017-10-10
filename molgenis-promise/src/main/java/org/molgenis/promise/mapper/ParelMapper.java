@@ -4,13 +4,13 @@ import com.google.common.collect.Iterables;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
 import org.molgenis.data.MolgenisDataException;
+import org.molgenis.data.jobs.Progress;
 import org.molgenis.data.meta.model.EntityType;
 import org.molgenis.data.support.DynamicEntity;
 import org.molgenis.promise.client.PromiseDataParser;
 import org.molgenis.promise.mapper.MappingReport.Status;
 import org.molgenis.promise.model.BbmriNlCheatSheet;
 import org.molgenis.promise.model.PromiseCredentials;
-import org.molgenis.promise.model.PromiseMappingProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,15 +96,15 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 	}
 
 	@Override
-	public MappingReport map(PromiseMappingProject promiseMappingProject)
+	public MappingReport map(Progress progress, PromiseCredentials promiseCredentials, String biobankId)
 	{
-		requireNonNull(promiseMappingProject);
+		//		requireNonNull(promiseMappingProject);
 		MappingReport report = new MappingReport();
 
 		try
 		{
-			LOG.info("Getting data from ProMISe for " + promiseMappingProject.getName());
-			PromiseCredentials promiseCredentials = promiseMappingProject.getPromiseCredentials();
+			//			LOG.info("Getting data from ProMISe for " + promiseMappingProject.getName());
+			//			promiseCredentials = promiseMappingProject.getPromiseCredentials();
 			EntityType targetEntityMetaData = requireNonNull(dataService.getEntityType(SAMPLE_COLLECTIONS_ENTITY));
 
 			// Parse biobanks
@@ -112,8 +112,7 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 			{
 
 				// find out if a sample collection with this id already exists
-				Entity targetEntity = dataService.findOneById(SAMPLE_COLLECTIONS_ENTITY,
-						promiseMappingProject.getBiobankId());
+				Entity targetEntity = dataService.findOneById(SAMPLE_COLLECTIONS_ENTITY, biobankId);
 
 				boolean biobankExists = true;
 				if (targetEntity == null)
@@ -148,7 +147,7 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 				}
 
 				// map data from ProMISe
-				targetEntity.set(BbmriNlCheatSheet.ID, promiseMappingProject.getBiobankId());
+				targetEntity.set(BbmriNlCheatSheet.ID, biobankId);
 				targetEntity.set(TYPE, toTypes(promiseBiobankEntity.get("COLLECTION_TYPE"))); // mref
 				targetEntity.set(MATERIALS, getMaterialTypes(promiseCredentials)); // mref
 				targetEntity.set(SEX, toGenders(promiseBiobankEntity.get("SEX"))); // mref
