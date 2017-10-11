@@ -29,6 +29,9 @@ import java.util.List;
 import static com.google.api.client.util.Lists.newArrayList;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
+import static org.molgenis.data.meta.model.AttributeMetadata.ATTRIBUTE_META_DATA;
+import static org.molgenis.data.meta.model.EntityTypeMetadata.ENTITY_TYPE_META_DATA;
+import static org.molgenis.data.meta.model.EntityTypeMetadata.PACKAGE;
 import static org.molgenis.data.meta.model.Package.PACKAGE_SEPARATOR;
 import static org.molgenis.promise.model.BbmriNlCheatSheet.*;
 import static org.molgenis.security.core.utils.SecurityUtils.*;
@@ -59,10 +62,11 @@ public class WebAppSystemEntityRegistry implements SystemEntityRegistry
 	private static final List<String> ANONYMOUS_USER_PLUGIN_READ_AUTHORITIES = Arrays.asList(HomeController.ID,
 			RedirectController.ID, FeedbackController.ID, DataExplorerController.ID);
 	private static final List<String> ANONYMOUS_USER_ENTITY_READ_AUTHORITIES = Arrays.asList(
-			FreemarkerTemplateMetaData.FREEMARKER_TEMPLATE, REF_AGE_TYPES, REF_BIOBANKS, REF_COLLECTION_TYPES,
-			REF_COUNTRIES, REF_DATA_CATEGORY_TYPES, REF_DISEASE_TYPES, REF_EXP_DATA_TYPES, REF_JURISTIC_PERSONS,
-			REF_MATERIAL_TYPES, LanguageMetadata.LANGUAGE, REF_PERSONS, REF_PUBLICATIONS, SAMPLE_COLLECTIONS_ENTITY,
-			REF_SAMPLE_SIZE_TYPES, REF_SEX_TYPES, REF_STAFF_SIZE_TYPES, DATA_EXPLORER_SETTINGS);
+			FreemarkerTemplateMetaData.FREEMARKER_TEMPLATE, REF_AGE_TYPES, ENTITY_TYPE_META_DATA, ATTRIBUTE_META_DATA,
+			PACKAGE, REF_BIOBANKS, REF_COLLECTION_TYPES, REF_COUNTRIES, REF_DATA_CATEGORY_TYPES, REF_DISEASE_TYPES,
+			REF_EXP_DATA_TYPES, REF_JURISTIC_PERSONS, REF_MATERIAL_TYPES, LanguageMetadata.LANGUAGE, REF_PERSONS,
+			REF_PUBLICATIONS, SAMPLE_COLLECTIONS_ENTITY, REF_SAMPLE_SIZE_TYPES, REF_SEX_TYPES, REF_STAFF_SIZE_TYPES,
+			DATA_EXPLORER_SETTINGS);
 
 	private final DataService dataService;
 	private final UserAuthorityFactory userAuthorityFactory;
