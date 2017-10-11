@@ -63,7 +63,7 @@ class RadboudMapper implements PromiseMapper, ApplicationListener<ContextRefresh
 		RadboudBiobankMapper biobankMapper = new RadboudBiobankMapper(dataService, entityManager);
 
 		progress.setProgressMax(3);
-		progress.status("Reading RADBOUD samples");
+		progress.progress(0, "Reading RADBOUD samples");
 		promiseDataParser.parse(promiseCredentials, 1, sampleEntity ->
 		{
 			if (shouldMap(sampleEntity)) samples.addSample(sampleEntity);
