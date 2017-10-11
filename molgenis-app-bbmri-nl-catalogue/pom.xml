@@ -4,10 +4,12 @@
     <parent>
         <groupId>org.molgenis</groupId>
         <artifactId>molgenis-bbmri-nl-catalogue</artifactId>
-        <version>2.1.0-BBMRI-NL-CATALOGUE-V2-SNAPSHOT</version>
+        <version>5.2.0-BBMRI-NL-CATALOGUE-SNAPSHOT</version>
     </parent>
     <artifactId>molgenis-app-bbmri-nl-catalogue</artifactId>
     <packaging>war</packaging>
+
+    <name>app-bbmri-nl-catalogue</name>
 
     <build>
         <resources>
@@ -17,6 +19,11 @@
             </resource>
         </resources>
         <plugins>
+            <!-- minify resources -->
+            <plugin>
+                <groupId>com.samaxes.maven</groupId>
+                <artifactId>minify-maven-plugin</artifactId>
+            </plugin>
             <!-- servlet container -->
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
@@ -57,6 +64,16 @@
     <dependencies>
         <dependency>
             <groupId>org.molgenis</groupId>
+            <artifactId>molgenis-promise</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.molgenis</groupId>
+            <artifactId>molgenis-apps</artifactId>
+            <version>${molgenis.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.molgenis</groupId>
             <artifactId>molgenis-bootstrap</artifactId>
             <version>${molgenis.version}</version>
         </dependency>
@@ -81,16 +98,6 @@
             <version>${molgenis.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-web</artifactId>
-            <version>${spring.security.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-config</artifactId>
-            <version>${spring.security.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-dataexplorer</artifactId>
             <version>${molgenis.version}</version>
@@ -98,6 +105,11 @@
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-pathways</artifactId>
+            <version>${molgenis.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.molgenis</groupId>
+            <artifactId>molgenis-data-plugin</artifactId>
             <version>${molgenis.version}</version>
         </dependency>
         <dependency>
@@ -155,16 +167,10 @@
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-data-vcf</artifactId>
             <version>${molgenis.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>log4j</artifactId>
-                    <groupId>log4j</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
-            <artifactId>molgenis-data-mapper</artifactId>
+            <artifactId>molgenis-semantic-mapper</artifactId>
             <version>${molgenis.version}</version>
         </dependency>
         <dependency>
@@ -178,29 +184,6 @@
             <version>${molgenis.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-aop</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context-support</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.molgenis</groupId>
-            <artifactId>molgenis-das</artifactId>
-            <version>${molgenis.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>log4j</artifactId>
-                    <groupId>log4j</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-model-registry</artifactId>
             <version>${molgenis.version}</version>
@@ -212,7 +195,7 @@
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
-            <artifactId>molgenis-data-semanticsearch</artifactId>
+            <artifactId>molgenis-semantic-search</artifactId>
             <version>${molgenis.version}</version>
         </dependency>
         <dependency>
@@ -242,17 +225,12 @@
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
-            <artifactId>molgenis-file-ingester</artifactId>
-            <version>${molgenis.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.molgenis</groupId>
             <artifactId>molgenis-gavin</artifactId>
             <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
-            <artifactId>molgenis-genetics-diag</artifactId>
+            <artifactId>molgenis-genomebrowser</artifactId>
             <version>${molgenis.version}</version>
         </dependency>
         <dependency>
@@ -262,8 +240,95 @@
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
-            <artifactId>molgenis-promise</artifactId>
-            <version>${project.version}</version>
+            <artifactId>molgenis-data-security</artifactId>
+            <version>${molgenis.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.molgenis</groupId>
+            <artifactId>molgenis-data-index</artifactId>
+            <version>${molgenis.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.molgenis</groupId>
+            <artifactId>molgenis-fair</artifactId>
+            <version>${molgenis.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.molgenis</groupId>
+            <artifactId>molgenis-util</artifactId>
+            <version>${molgenis.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.molgenis</groupId>
+            <artifactId>molgenis-settings</artifactId>
+            <version>${molgenis.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.molgenis</groupId>
+            <artifactId>molgenis-swagger</artifactId>
+            <version>${molgenis.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.molgenis</groupId>
+            <artifactId>molgenis-amazon-bucket</artifactId>
+            <version>${molgenis.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.molgenis</groupId>
+            <artifactId>molgenis-navigator</artifactId>
+            <version>${molgenis.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.molgenis</groupId>
+            <artifactId>molgenis-metadata-manager</artifactId>
+            <version>${molgenis.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.molgenis</groupId>
+            <artifactId>molgenis-one-click-importer</artifactId>
+            <version>${molgenis.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.molgenis</groupId>
+            <artifactId>molgenis-web</artifactId>
+            <version>${molgenis.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.molgenis</groupId>
+            <artifactId>molgenis-test</artifactId>
+            <version>${molgenis.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <!-- Remove exclusions when https://issues.apache.org/jira/browse/MNG-5600 has been resolved -->
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-config</artifactId>
+            <!-- Remove exclusions when https://issues.apache.org/jira/browse/MNG-5600 has been resolved -->
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 </project>

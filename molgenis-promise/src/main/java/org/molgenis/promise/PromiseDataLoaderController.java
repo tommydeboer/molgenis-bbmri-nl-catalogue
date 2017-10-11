@@ -7,7 +7,7 @@ import org.molgenis.promise.mapper.PromiseMapper;
 import org.molgenis.promise.mapper.PromiseMapperFactory;
 import org.molgenis.promise.model.PromiseMappingProject;
 import org.molgenis.security.core.runas.RunAsSystem;
-import org.molgenis.ui.MolgenisPluginController;
+import org.molgenis.web.PluginController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +34,10 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @Controller
 @EnableScheduling
 @RequestMapping(URI)
-public class PromiseDataLoaderController extends MolgenisPluginController
+public class PromiseDataLoaderController extends PluginController
 {
 	public static final String ID = "promiseloader";
-	static final String URI = MolgenisPluginController.PLUGIN_URI_PREFIX + ID;
+	static final String URI = PluginController.PLUGIN_URI_PREFIX + ID;
 
 	private static final Logger LOG = LoggerFactory.getLogger(PromiseDataLoaderController.class);
 
@@ -67,7 +67,8 @@ public class PromiseDataLoaderController extends MolgenisPluginController
 	public List<String> projects()
 	{
 		return dataService.findAll(PROMISE_MAPPING_PROJECT, PromiseMappingProject.class)
-				.map(PromiseMappingProject::getName).collect(toList());
+						  .map(PromiseMappingProject::getName)
+						  .collect(toList());
 	}
 
 	@RequestMapping(value = "map/{name}", method = GET)
@@ -75,8 +76,8 @@ public class PromiseDataLoaderController extends MolgenisPluginController
 	@Transactional
 	public MappingReport map(@PathVariable("name") String projectName) throws IOException
 	{
-		PromiseMappingProject promiseMappingProject = dataService
-				.findOneById(PROMISE_MAPPING_PROJECT, projectName, PromiseMappingProject.class);
+		PromiseMappingProject promiseMappingProject = dataService.findOneById(PROMISE_MAPPING_PROJECT, projectName,
+				PromiseMappingProject.class);
 		if (promiseMappingProject == null)
 		{
 			throw new UnknownEntityException(format("Unknown promise mapping project [%s]", projectName));
@@ -90,8 +91,8 @@ public class PromiseDataLoaderController extends MolgenisPluginController
 	public void executeScheduled()
 	{
 		// TODO make configurable via MOLGENIS 'scheduler': http://www.molgenis.org/ticket/4207
-		Stream<PromiseMappingProject> promiseMappingProjectStream = dataService
-				.findAll(PROMISE_MAPPING_PROJECT, PromiseMappingProject.class);
+		Stream<PromiseMappingProject> promiseMappingProjectStream = dataService.findAll(PROMISE_MAPPING_PROJECT,
+				PromiseMappingProject.class);
 		promiseMappingProjectStream.forEach(project ->
 		{
 			LOG.info("Starting scheduled mapping task for ProMISe biobank " + project.getName());
