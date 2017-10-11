@@ -19,8 +19,8 @@ import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.molgenis.data.EntityManager.CreationMode.NO_POPULATE;
 import static org.molgenis.data.EntityManager.CreationMode.POPULATE;
@@ -104,14 +104,19 @@ public class RadboudBiobankMapperTest
 		when(sampleCollectionsEntityType.getAttribute(BIOBANK_SAMPLE_ACCESS_URI)).thenReturn(stringAttr);
 		when(sampleCollectionsEntityType.getAttribute(WEBSITE)).thenReturn(stringAttr);
 		when(sampleCollectionsEntityType.getAttribute(BIOBANK_DATA_ACCESS_URI)).thenReturn(stringAttr);
-		when(sampleCollectionsEntityType.getAttribute(BbmriNlCheatSheet.PRINCIPAL_INVESTIGATORS))
-				.thenReturn(principalInvestigatorAttr);
+		when(sampleCollectionsEntityType.getAttribute(BbmriNlCheatSheet.PRINCIPAL_INVESTIGATORS)).thenReturn(
+				principalInvestigatorAttr);
 		when(sampleCollectionsEntityType.getAttribute(INSTITUTES)).thenReturn(institutesAttr);
 		when(sampleCollectionsEntityType.getAttribute(NAME)).thenReturn(stringAttr);
 		when(sampleCollectionsEntityType.getAttribute(TYPE)).thenReturn(mrefAttr);
+		when(sampleCollectionsEntityType.getAttribute(DATA_CATEGORIES)).thenReturn(mrefAttr);
+		when(sampleCollectionsEntityType.getAttribute(MATERIALS)).thenReturn(mrefAttr);
+		when(sampleCollectionsEntityType.getAttribute(OMICS)).thenReturn(mrefAttr);
+		when(sampleCollectionsEntityType.getAttribute(SEX)).thenReturn(mrefAttr);
 		when(sampleCollectionsEntityType.getAttribute(AGE_UNIT)).thenReturn(xrefAttr);
 		when(sampleCollectionsEntityType.getAttribute(AGE_LOW)).thenReturn(intAttr);
 		when(sampleCollectionsEntityType.getAttribute(AGE_HIGH)).thenReturn(intAttr);
+		when(sampleCollectionsEntityType.getAttribute(DISEASE)).thenReturn(mrefAttr);
 		when(sampleCollectionsEntityType.getAttribute(NUMBER_OF_DONORS)).thenReturn(intAttr);
 		when(sampleCollectionsEntityType.getAttribute(DESCRIPTION)).thenReturn(stringAttr);
 		when(sampleCollectionsEntityType.getAttribute(CONTACT_PERSON)).thenReturn(mrefAttr);
@@ -134,8 +139,8 @@ public class RadboudBiobankMapperTest
 
 		EntityManager entityManager = mock(EntityManager.class);
 		radboudBiobankMapper = new RadboudBiobankMapper(dataService, entityManager);
-		when(entityManager.create(sampleCollectionsEntityType, POPULATE))
-				.thenReturn(new DynamicEntity(sampleCollectionsEntityType));
+		when(entityManager.create(sampleCollectionsEntityType, POPULATE)).thenReturn(
+				new DynamicEntity(sampleCollectionsEntityType));
 		when(entityManager.create(personEntityType, NO_POPULATE)).thenReturn(new DynamicEntity(personEntityType));
 		when(entityManager.create(personEntityType, POPULATE)).thenReturn(new DynamicEntity(personEntityType));
 
@@ -178,7 +183,7 @@ public class RadboudBiobankMapperTest
 		assertEquals(mappedEntity.get(BIOBANK_DATA_ACCESS_URI), ACCESS_URI);
 
 		Iterator<Entity> investigatorIterator = mappedEntity.getEntities(BbmriNlCheatSheet.PRINCIPAL_INVESTIGATORS)
-				.iterator();
+															.iterator();
 		Entity investigator = investigatorIterator.next();
 		assertEquals(investigator.get(ID), "9000_1");
 		assertEquals(investigator.get(COUNTRY), NL_COUNTRY_ENTITY);
@@ -207,8 +212,8 @@ public class RadboudBiobankMapperTest
 		existingCollection.set(BbmriNlCheatSheet.PRINCIPAL_INVESTIGATORS, emptyList());
 		existingCollection.set(INSTITUTES, emptyList());
 
-		Entity mappedEntity = radboudBiobankMapper
-				.mapExistingBiobank(biobank, radboudSampleMap, radboudDiseaseMap, existingCollection);
+		Entity mappedEntity = radboudBiobankMapper.mapExistingBiobank(biobank, radboudSampleMap, radboudDiseaseMap,
+				existingCollection);
 
 		// check that these fields aren't overwritten
 		assertEquals(mappedEntity.get(ACRONYM), "ABC");
