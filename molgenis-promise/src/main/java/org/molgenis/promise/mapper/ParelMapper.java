@@ -9,7 +9,6 @@ import org.molgenis.data.meta.model.EntityType;
 import org.molgenis.data.support.DynamicEntity;
 import org.molgenis.promise.PromiseMapperType;
 import org.molgenis.promise.client.PromiseDataParser;
-import org.molgenis.promise.mapper.MappingReport.Status;
 import org.molgenis.promise.model.BbmriNlCheatSheet;
 import org.molgenis.promise.model.PromiseCredentials;
 import org.slf4j.Logger;
@@ -18,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.*;
@@ -90,90 +90,73 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 	}
 
 	@Override
-	public MappingReport map(Progress progress, PromiseCredentials promiseCredentials, String biobankId)
+	@Transactional
+	public int map(Progress progress, PromiseCredentials promiseCredentials, String biobankId) throws IOException
 	{
-		//		requireNonNull(promiseMappingProject);
-		MappingReport report = new MappingReport();
+		progress.status("Mapping biobank from ProMISe with id " + biobankId);
 
-		try
+		EntityType targetEntityMetaData = requireNonNull(dataService.getEntityType(SAMPLE_COLLECTIONS_ENTITY));
+
+		// Parse biobanks
+		promiseDataParser.parse(promiseCredentials, 0, promiseBiobankEntity ->
 		{
-			//			LOG.info("Getting data from ProMISe for " + promiseMappingProject.getName());
-			//			promiseCredentials = promiseMappingProject.getPromiseCredentials();
-			EntityType targetEntityMetaData = requireNonNull(dataService.getEntityType(SAMPLE_COLLECTIONS_ENTITY));
 
-			// Parse biobanks
-			promiseDataParser.parse(promiseCredentials, 0, promiseBiobankEntity ->
+			// find out if a sample collection with this id already exists
+			Entity targetEntity = dataService.findOneById(SAMPLE_COLLECTIONS_ENTITY, biobankId);
+
+			boolean biobankExists = true;
+			if (targetEntity == null)
 			{
+				targetEntity = new DynamicEntity(targetEntityMetaData);
 
-				// find out if a sample collection with this id already exists
-				Entity targetEntity = dataService.findOneById(SAMPLE_COLLECTIONS_ENTITY, biobankId);
+				// fill hand coded fields with dummy data the first time this biobank is added
+				targetEntity.set(CONTACT_PERSON, singletonList(getTempPerson())); // mref
+				targetEntity.set(PRINCIPAL_INVESTIGATORS, singletonList(getTempPerson())); // mref
+				targetEntity.set(INSTITUTES, singletonList(getTempJuristicPerson())); // mref
+				targetEntity.set(DISEASE, singletonList(getTempDisease())); // mref
+				targetEntity.set(OMICS, singletonList(getTempOmics())); // mref
+				targetEntity.set(DATA_CATEGORIES, singletonList(getTempDataCategories())); // mref
 
-				boolean biobankExists = true;
-				if (targetEntity == null)
-				{
-					targetEntity = new DynamicEntity(targetEntityMetaData);
+				targetEntity.set(NAME, null); // nillable
+				targetEntity.set(ACRONYM, null); // nillable
+				targetEntity.set(DESCRIPTION, null); // nillable
+				targetEntity.set(PUBLICATIONS, null); // nillable
+				targetEntity.set(BIOBANKS, null); // nillable
+				targetEntity.set(WEBSITE, "http://www.parelsnoer.org/"); // nillable
+				targetEntity.set(BIOBANK_SAMPLE_ACCESS_FEE, null); // nillable
+				targetEntity.set(BIOBANK_SAMPLE_ACCESS_JOINT_PROJECTS, null); // nillable
+				targetEntity.set(BIOBANK_SAMPLE_ACCESS_DESCRIPTION, null); // nillable
+				targetEntity.set(BIOBANK_SAMPLE_ACCESS_URI, "http://www.parelsnoer.org/page/Onderzoeker"); // nillable
+				targetEntity.set(BIOBANK_DATA_ACCESS_FEE, null); // nillable
+				targetEntity.set(BIOBANK_DATA_ACCESS_JOINT_PROJECTS, null); // nillable
+				targetEntity.set(BIOBANK_DATA_ACCESS_DESCRIPTION, null); // nillable
+				targetEntity.set(BIOBANK_DATA_ACCESS_URI, "http://www.parelsnoer.org/page/Onderzoeker"); // nillable
 
-					// fill hand coded fields with dummy data the first time this biobank is added
-					targetEntity.set(CONTACT_PERSON, singletonList(getTempPerson())); // mref
-					targetEntity.set(PRINCIPAL_INVESTIGATORS, singletonList(getTempPerson())); // mref
-					targetEntity.set(INSTITUTES, singletonList(getTempJuristicPerson())); // mref
-					targetEntity.set(DISEASE, singletonList(getTempDisease())); // mref
-					targetEntity.set(OMICS, singletonList(getTempOmics())); // mref
-					targetEntity.set(DATA_CATEGORIES, singletonList(getTempDataCategories())); // mref
+				biobankExists = false;
+			}
 
-					targetEntity.set(NAME, null); // nillable
-					targetEntity.set(ACRONYM, null); // nillable
-					targetEntity.set(DESCRIPTION, null); // nillable
-					targetEntity.set(PUBLICATIONS, null); // nillable
-					targetEntity.set(BIOBANKS, null); // nillable
-					targetEntity.set(WEBSITE, "http://www.parelsnoer.org/"); // nillable
-					targetEntity.set(BIOBANK_SAMPLE_ACCESS_FEE, null); // nillable
-					targetEntity.set(BIOBANK_SAMPLE_ACCESS_JOINT_PROJECTS, null); // nillable
-					targetEntity.set(BIOBANK_SAMPLE_ACCESS_DESCRIPTION, null); // nillable
-					targetEntity.set(BIOBANK_SAMPLE_ACCESS_URI,
-							"http://www.parelsnoer.org/page/Onderzoeker"); // nillable
-					targetEntity.set(BIOBANK_DATA_ACCESS_FEE, null); // nillable
-					targetEntity.set(BIOBANK_DATA_ACCESS_JOINT_PROJECTS, null); // nillable
-					targetEntity.set(BIOBANK_DATA_ACCESS_DESCRIPTION, null); // nillable
-					targetEntity.set(BIOBANK_DATA_ACCESS_URI, "http://www.parelsnoer.org/page/Onderzoeker"); // nillable
+			// map data from ProMISe
+			targetEntity.set(BbmriNlCheatSheet.ID, biobankId);
+			targetEntity.set(TYPE, toTypes(promiseBiobankEntity.get("COLLECTION_TYPE"))); // mref
+			targetEntity.set(MATERIALS, getMaterialTypes(promiseCredentials)); // mref
+			targetEntity.set(SEX, toGenders(promiseBiobankEntity.get("SEX"))); // mref
+			targetEntity.set(AGE_LOW, Integer.valueOf(promiseBiobankEntity.get("AGE_LOW"))); // nillable
+			targetEntity.set(AGE_HIGH, Integer.valueOf(promiseBiobankEntity.get("AGE_HIGH"))); // nillable
+			targetEntity.set(AGE_UNIT, toAgeType(promiseBiobankEntity.get("AGE_UNIT")));
+			targetEntity.set(NUMBER_OF_DONORS, Integer.valueOf(promiseBiobankEntity.get("NUMBER_DONORS"))); // nillable
 
-					biobankExists = false;
-				}
-
-				// map data from ProMISe
-				targetEntity.set(BbmriNlCheatSheet.ID, biobankId);
-				targetEntity.set(TYPE, toTypes(promiseBiobankEntity.get("COLLECTION_TYPE"))); // mref
-				targetEntity.set(MATERIALS, getMaterialTypes(promiseCredentials)); // mref
-				targetEntity.set(SEX, toGenders(promiseBiobankEntity.get("SEX"))); // mref
-				targetEntity.set(AGE_LOW, Integer.valueOf(promiseBiobankEntity.get("AGE_LOW"))); // nillable
-				targetEntity.set(AGE_HIGH, Integer.valueOf(promiseBiobankEntity.get("AGE_HIGH"))); // nillable
-				targetEntity.set(AGE_UNIT, toAgeType(promiseBiobankEntity.get("AGE_UNIT")));
-				targetEntity.set(NUMBER_OF_DONORS,
-						Integer.valueOf(promiseBiobankEntity.get("NUMBER_DONORS"))); // nillable
-
-				if (biobankExists)
-				{
-					LOG.info("Updating Sample Collection with id " + targetEntity.getIdValue());
-					dataService.update(SAMPLE_COLLECTIONS_ENTITY, targetEntity);
-				}
-				else
-				{
-					LOG.info("Adding new Sample Collection with id " + targetEntity.getIdValue());
-					dataService.add(SAMPLE_COLLECTIONS_ENTITY, targetEntity);
-				}
-
-				report.setStatus(Status.SUCCESS);
-			});
-		}
-		catch (Exception e)
-		{
-			report.setStatus(Status.ERROR);
-			report.setMessage(e.getMessage());
-
-			LOG.error("Something went wrong: {}", e);
-		}
-
-		return report;
+			if (biobankExists)
+			{
+				progress.status("Updating Sample Collection with id " + targetEntity.getIdValue());
+				dataService.update(SAMPLE_COLLECTIONS_ENTITY, targetEntity);
+			}
+			else
+			{
+				progress.status("Adding new Sample Collection with id " + targetEntity.getIdValue());
+				dataService.add(SAMPLE_COLLECTIONS_ENTITY, targetEntity);
+			}
+		});
+		return 1;
 	}
 
 	private Iterable<Entity> getMaterialTypes(PromiseCredentials credentials)
