@@ -15,16 +15,6 @@
         <apache.axiom.version>1.2.19</apache.axiom.version>
     </properties>
 
-    <build>
-        <plugins>
-            <!-- minify resources -->
-            <plugin>
-                <groupId>com.samaxes.maven</groupId>
-                <artifactId>minify-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
-
     <dependencies>
         <dependency>
             <groupId>org.molgenis</groupId>
