@@ -1,6 +1,5 @@
 package org.molgenis.promise.mapper;
 
-import com.google.common.collect.Iterables;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
 import org.molgenis.data.MolgenisDataException;
@@ -11,6 +10,7 @@ import org.molgenis.promise.PromiseMapperType;
 import org.molgenis.promise.client.PromiseDataParser;
 import org.molgenis.promise.model.BbmriNlCheatSheet;
 import org.molgenis.promise.model.PromiseCredentials;
+import org.molgenis.promise.model.PromiseMaterialType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,55 +20,25 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
-import static com.google.common.collect.Sets.newHashSet;
-import static java.util.Arrays.asList;
+import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+import static org.hibernate.validator.util.CollectionHelper.asSet;
 import static org.molgenis.promise.model.BbmriNlCheatSheet.*;
+import static org.molgenis.promise.model.PromiseMaterialTypeMetadata.PROMISE_MATERIAL_TYPE;
 
 @Component
 public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRefreshedEvent>
 {
 	private static final Logger LOG = LoggerFactory.getLogger(ParelMapper.class);
 	private static final String UNKNOWN = "Unknown";
-
-	private static final Map<String, List<String>> materialTypesMap;
-
-	static
-	{
-		materialTypesMap = new HashMap<>();
-		materialTypesMap.put("bloed", singletonList("WHOLE BLOOD"));
-		materialTypesMap.put("bloedplasma", singletonList("PLASMA"));
-		materialTypesMap.put("bloedplasma (EDTA)", singletonList("PLASMA"));
-		materialTypesMap.put("bloedserum", singletonList("SERUM"));
-		materialTypesMap.put("DNA uit beenmergcellen", singletonList("DNA"));
-		materialTypesMap.put("DNA uit bloedcellen", singletonList("DNA"));
-		materialTypesMap.put("feces", singletonList("FECES"));
-		materialTypesMap.put("gastrointestinale mucosa", singletonList("TISSUE_FROZEN"));
-		materialTypesMap.put("liquor (CSF)", singletonList("OTHER"));
-		materialTypesMap.put("mononucleaire celfractie uit beenmerg", singletonList("OTHER"));
-		materialTypesMap.put("mononucleaire celfractie uit bloed", singletonList("PERIPHERAL_BLOOD_CELLS"));
-		materialTypesMap.put("RNA uit beenmergcellen", singletonList("RNA"));
-		materialTypesMap.put("RNA uit bloedcellen", singletonList("RNA"));
-		materialTypesMap.put("serum", singletonList("SERUM"));
-		materialTypesMap.put("urine", singletonList("URINE"));
-		materialTypesMap.put("weefsel", asList("TISSUE_FROZEN", "TISSUE_PARAFFIN_EMBEDDED"));
-	}
-
-	private static final Map<String, List<String>> tissueTypesMap;
-
-	static
-	{
-		tissueTypesMap = new HashMap<>();
-		tissueTypesMap.put("1", singletonList("TISSUE_PARAFFIN_EMBEDDED"));
-		tissueTypesMap.put("2", singletonList("TISSUE_FROZEN"));
-		tissueTypesMap.put("9", singletonList("OTHER"));
-	}
 
 	private final PromiseMapperFactory promiseMapperFactory;
 	private final PromiseDataParser promiseDataParser;
@@ -138,7 +108,7 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 			// map data from ProMISe
 			targetEntity.set(BbmriNlCheatSheet.ID, biobankId);
 			targetEntity.set(TYPE, toTypes(promiseBiobankEntity.get("COLLECTION_TYPE"))); // mref
-			targetEntity.set(MATERIALS, getMaterialTypes(promiseCredentials)); // mref
+			targetEntity.set(MATERIALS, toMaterialTypes(promiseBiobankEntity.get("MATERIAL_TYPES"))); // mref
 			targetEntity.set(SEX, toGenders(promiseBiobankEntity.get("SEX"))); // mref
 			targetEntity.set(AGE_LOW, Integer.valueOf(promiseBiobankEntity.get("AGE_LOW"))); // nillable
 			targetEntity.set(AGE_HIGH, Integer.valueOf(promiseBiobankEntity.get("AGE_HIGH"))); // nillable
@@ -159,38 +129,49 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 		return 1;
 	}
 
-	private Iterable<Entity> getMaterialTypes(PromiseCredentials credentials)
+	Iterable<Entity> toMaterialTypes(String promiseMaterialTypeString)
 	{
-		final Set<String> materialTypeIds = newHashSet();
-		final Set<String> unknownMaterialTypes = newHashSet();
-		try
-		{
-			promiseDataParser.parse(credentials, 1, promiseSampleEntity ->
-			{
-				RetrievedMaterialTypes retrievedMaterialTypes = toMaterialTypes(
-						promiseSampleEntity.get("MATERIAL_TYPES"), promiseSampleEntity.get("MATERIAL_TYPES_SUB"));
+		Set<Object> promiseIds = asSet(promiseMaterialTypeString.split(","));
+		List<PromiseMaterialType> foundMaterialTypes = findPromiseMaterialTypes(promiseIds);
 
-				materialTypeIds.addAll(retrievedMaterialTypes.getMaterialTypeIds());
-				unknownMaterialTypes.addAll(retrievedMaterialTypes.getUnknownMaterialTypes());
-			});
-		}
-		catch (IOException e)
-		{
-			LOG.error("Something went wrong: {}", e);
-		}
+		Set<Object> miabisIds = foundMaterialTypes.stream()
+												  .flatMap(PromiseMaterialType::getMiabisMaterialTypes)
+												  .map(type -> (Object) type)
+												  .collect(toSet());
+		return findMiabisMaterialTypes(miabisIds);
+	}
 
-		if (!unknownMaterialTypes.isEmpty())
+	private List<Entity> findMiabisMaterialTypes(Set<Object> miabisMaterialTypeIds)
+	{
+		List<Entity> foundMiabisMaterialTypes = dataService.findAll(REF_MATERIAL_TYPES, miabisMaterialTypeIds.stream())
+														   .collect(toList());
+		Set<Object> foundMiabisIds = foundMiabisMaterialTypes.stream().map(Entity::getIdValue).collect(toSet());
+
+		miabisMaterialTypeIds.removeAll(foundMiabisIds);
+
+		if (!miabisMaterialTypeIds.isEmpty())
 		{
 			throw new MolgenisDataException(
-					"Unknown ProMISe material types: [" + String.join(",", unknownMaterialTypes) + "]");
+					format("MIABIS material type(s) %s not found in [%s]", miabisMaterialTypeIds, REF_MATERIAL_TYPES));
 		}
+		return foundMiabisMaterialTypes;
+	}
 
-		Iterable<Entity> materialTypes = dataService.findAll(REF_MATERIAL_TYPES,
-				materialTypeIds.stream().map(id -> (Object) id)).collect(Collectors.toList());
+	private List<PromiseMaterialType> findPromiseMaterialTypes(Set<Object> promiseMaterialTypeIds)
+	{
+		List<PromiseMaterialType> foundMaterialTypes = dataService.findAll(PROMISE_MATERIAL_TYPE,
+				promiseMaterialTypeIds.stream(), PromiseMaterialType.class).collect(toList());
 
-		if (Iterables.isEmpty(materialTypes)) throw new MolgenisDataException(
-				"Couldn't find mappings for some of the material types in:" + materialTypeIds);
-		return materialTypes;
+		Set<Object> foundIds = foundMaterialTypes.stream().map(PromiseMaterialType::getId).collect(toSet());
+		promiseMaterialTypeIds.removeAll(foundIds);
+
+		if (!promiseMaterialTypeIds.isEmpty())
+		{
+			throw new MolgenisDataException(
+					format("ProMISe material type(s) %s not found in [%s]", promiseMaterialTypeIds,
+							PROMISE_MATERIAL_TYPE));
+		}
+		return foundMaterialTypes;
 	}
 
 	private Object getTempDataCategories()
@@ -272,59 +253,5 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 			throw new MolgenisDataException("Unknown '" + REF_COLLECTION_TYPES + "' [" + promiseTypes + "]");
 		}
 		return collectionTypes;
-	}
-
-	private RetrievedMaterialTypes toMaterialTypes(String type, String tissue)
-	{
-		Set<String> unknownMaterialTypes = newHashSet();
-		Set<String> materialTypeIds = newHashSet();
-
-		if (type.equals("weefsel") && tissue != null)
-		{
-			if (tissueTypesMap.containsKey(tissue))
-			{
-				materialTypeIds.addAll(tissueTypesMap.get(tissue));
-			}
-			else
-			{
-				unknownMaterialTypes.add(tissue);
-			}
-		}
-		else
-		{
-			if (materialTypesMap.containsKey(type))
-			{
-				materialTypeIds.addAll(materialTypesMap.get(type));
-			}
-			else
-			{
-				unknownMaterialTypes.add(type);
-			}
-		}
-
-		return new RetrievedMaterialTypes(materialTypeIds, unknownMaterialTypes);
-	}
-
-	private class RetrievedMaterialTypes
-	{
-		private Set<String> materialTypeIds;
-		private Set<String> unknownMaterialTypes;
-
-		private RetrievedMaterialTypes(Set<String> materialTypeIds, Set<String> unknownMaterialTypes)
-		{
-
-			this.materialTypeIds = requireNonNull(materialTypeIds);
-			this.unknownMaterialTypes = requireNonNull(unknownMaterialTypes);
-		}
-
-		Set<String> getMaterialTypeIds()
-		{
-			return materialTypeIds;
-		}
-
-		Set<String> getUnknownMaterialTypes()
-		{
-			return unknownMaterialTypes;
-		}
 	}
 }

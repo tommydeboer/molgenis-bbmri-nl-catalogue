@@ -5,8 +5,8 @@ import org.molgenis.data.meta.model.EntityType;
 import org.molgenis.data.support.StaticEntity;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.molgenis.promise.model.PromiseCredentialsMetadata.ID;
 import static org.molgenis.promise.model.PromiseMaterialTypeMetadata.*;
@@ -49,13 +49,13 @@ public class PromiseMaterialType extends StaticEntity
 		set(PROMISE_TYPE, promiseMaterialType);
 	}
 
-	public List<String> getMiabisMaterialTypes()
+	public Stream<String> getMiabisMaterialTypes()
 	{
-		return Arrays.asList(getString(MIABIS_TYPES).split(","));
+		return Arrays.stream(getString(MIABIS_TYPES).split(","));
 	}
 
-	public void setMiabisMaterialTypes(List<String> miabisMaterialTypes)
+	public void setMiabisMaterialTypes(Stream<String> miabisMaterialTypes)
 	{
-		set(MIABIS_TYPES, miabisMaterialTypes.stream().collect(Collectors.joining(",")));
+		set(MIABIS_TYPES, miabisMaterialTypes.collect(Collectors.joining(",")));
 	}
 }
