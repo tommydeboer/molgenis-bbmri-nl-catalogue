@@ -8,8 +8,8 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.molgenis.promise.model.PromiseCredentialsMetadata.ID;
-import static org.molgenis.promise.model.PromiseMaterialTypeMetadata.*;
+import static org.molgenis.promise.model.PromiseMaterialTypeMetadata.ID;
+import static org.molgenis.promise.model.PromiseMaterialTypeMetadata.MIABIS_TYPES;
 
 public class PromiseMaterialType extends StaticEntity
 {
@@ -37,16 +37,6 @@ public class PromiseMaterialType extends StaticEntity
 	public void setId(String id)
 	{
 		set(ID, id);
-	}
-
-	public String getPromiseMaterialType()
-	{
-		return getString(PROMISE_MATERIAL_TYPE);
-	}
-
-	public void setPromiseMaterialType(String promiseMaterialType)
-	{
-		set(PROMISE_TYPE, promiseMaterialType);
 	}
 
 	public Stream<String> getMiabisMaterialTypes()
