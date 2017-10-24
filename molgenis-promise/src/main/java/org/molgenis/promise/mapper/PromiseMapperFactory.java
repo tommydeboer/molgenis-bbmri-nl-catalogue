@@ -17,10 +17,10 @@ public class PromiseMapperFactory
 	private final Map<PromiseMapperType, PromiseMapper> mappers = Maps.newHashMap();
 
 	@RunAsSystem
-	void registerMapper(PromiseMapperType id, PromiseMapper promiseMapper)
+	public void registerMapper(PromiseMapper promiseMapper)
 	{
-		LOG.info("Registering ProMISe mapper [{}].", id);
-		mappers.put(id, promiseMapper);
+		LOG.info("Registering ProMISe mapper [{}].", promiseMapper.getType());
+		mappers.put(promiseMapper.getType(), promiseMapper);
 	}
 
 	public PromiseMapper getMapper(PromiseMapperType id)
