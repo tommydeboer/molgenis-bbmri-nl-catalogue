@@ -8,8 +8,6 @@ import org.molgenis.promise.PromiseMapperType;
 import org.molgenis.promise.client.PromiseDataParser;
 import org.molgenis.promise.model.PromiseCredentials;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,30 +20,27 @@ import static java.util.Objects.requireNonNull;
 import static org.molgenis.promise.model.BbmriNlCheatSheet.SAMPLE_COLLECTIONS_ENTITY;
 
 @Component
-class RadboudMapper implements PromiseMapper, ApplicationListener<ContextRefreshedEvent>
+class RadboudMapper implements PromiseMapper
 {
 	static final String XML_ID = "ID";
 	static final String XML_IDAA = "IDAA";
 
 	private final PromiseDataParser promiseDataParser;
 	private final DataService dataService;
-	private final PromiseMapperFactory promiseMapperFactory;
 	private final EntityManager entityManager;
 
 	@Autowired
-	public RadboudMapper(PromiseDataParser promiseDataParser, DataService dataService,
-			PromiseMapperFactory promiseMapperFactory, EntityManager entityManager)
+	public RadboudMapper(PromiseDataParser promiseDataParser, DataService dataService, EntityManager entityManager)
 	{
 		this.promiseDataParser = requireNonNull(promiseDataParser);
 		this.dataService = requireNonNull(dataService);
-		this.promiseMapperFactory = requireNonNull(promiseMapperFactory);
 		this.entityManager = requireNonNull(entityManager);
 	}
 
 	@Override
-	public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent)
+	public PromiseMapperType getType()
 	{
-		promiseMapperFactory.registerMapper(PromiseMapperType.RADBOUD, this);
+		return PromiseMapperType.RADBOUD;
 	}
 
 	@Override

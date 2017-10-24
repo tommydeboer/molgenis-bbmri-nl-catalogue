@@ -1,6 +1,7 @@
 package org.molgenis.promise.mapper;
 
 import org.molgenis.data.jobs.Progress;
+import org.molgenis.promise.PromiseMapperType;
 import org.molgenis.promise.model.PromiseCredentials;
 
 import java.io.IOException;
@@ -10,6 +11,13 @@ import java.io.IOException;
  */
 public interface PromiseMapper
 {
+	/**
+	 * Returns the type of this mapper.
+	 *
+	 * @return PromiseMapperType
+	 */
+	PromiseMapperType getType();
+
 	/**
 	 * Initiate the mapping.
 	 *

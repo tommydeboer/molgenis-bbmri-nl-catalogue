@@ -14,8 +14,6 @@ import org.molgenis.promise.model.PromiseCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +30,7 @@ import static java.util.stream.Collectors.toList;
 import static org.molgenis.promise.model.BbmriNlCheatSheet.*;
 
 @Component
-public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRefreshedEvent>
+public class ParelMapper implements PromiseMapper
 {
 	private static final Logger LOG = LoggerFactory.getLogger(ParelMapper.class);
 	private static final String UNKNOWN = "Unknown";
@@ -70,23 +68,20 @@ public class ParelMapper implements PromiseMapper, ApplicationListener<ContextRe
 		tissueTypesMap.put("9", singletonList("OTHER"));
 	}
 
-	private final PromiseMapperFactory promiseMapperFactory;
 	private final PromiseDataParser promiseDataParser;
 	private final DataService dataService;
 
 	@Autowired
-	public ParelMapper(PromiseMapperFactory promiseMapperFactory, PromiseDataParser promiseDataParser,
-			DataService dataService)
+	public ParelMapper(PromiseDataParser promiseDataParser, DataService dataService)
 	{
-		this.promiseMapperFactory = requireNonNull(promiseMapperFactory);
 		this.promiseDataParser = requireNonNull(promiseDataParser);
 		this.dataService = requireNonNull(dataService);
 	}
 
 	@Override
-	public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent)
+	public PromiseMapperType getType()
 	{
-		promiseMapperFactory.registerMapper(PromiseMapperType.PAREL, this);
+		return PromiseMapperType.PAREL;
 	}
 
 	@Override
