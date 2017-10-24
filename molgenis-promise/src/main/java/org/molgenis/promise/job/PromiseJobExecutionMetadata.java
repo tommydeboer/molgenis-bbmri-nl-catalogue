@@ -7,19 +7,19 @@ import org.molgenis.data.meta.SystemEntityType;
 import org.molgenis.promise.PromiseMapperType;
 import org.springframework.stereotype.Component;
 
-import static java.util.Arrays.asList;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import static java.util.Objects.requireNonNull;
 import static org.molgenis.data.jobs.model.JobPackage.PACKAGE_JOB;
-import static org.molgenis.data.meta.model.Package.PACKAGE_SEPARATOR;
 
 @Component
 public class PromiseJobExecutionMetadata extends SystemEntityType
 {
 	private static final String SIMPLE_NAME = "PromiseJobExecution";
-	static final String PROMISE_JOB_EXECUTION = PACKAGE_JOB + PACKAGE_SEPARATOR + SIMPLE_NAME;
-	static final String JOB_TYPE = "promise";
 
-	static final String BIOBANK_ID = "biobankdId";
+	static final String JOB_TYPE = "promise";
+	static final String BIOBANK_ID = "biobankId";
 	static final String CREDENTIALS = "credentials";
 	static final String MAPPER = "mapper";
 
@@ -46,8 +46,9 @@ public class PromiseJobExecutionMetadata extends SystemEntityType
 								 .setDescription("The identifier of the PromiseCredentials entity to use.");
 		addAttribute(MAPPER).setLabel("Mapper Type")
 							.setDataType(AttributeType.ENUM)
-							.setEnumOptions(
-									asList(PromiseMapperType.PAREL.toString(), PromiseMapperType.RADBOUD.toString()))
+							.setEnumOptions(Arrays.stream(PromiseMapperType.values())
+												  .map(PromiseMapperType::name)
+												  .collect(Collectors.toList()))
 							.setNillable(false);
 	}
 }

@@ -43,7 +43,7 @@ import static org.molgenis.security.core.utils.SecurityUtils.*;
 public class WebAppSystemEntityRegistry implements SystemEntityRegistry
 {
 	private static final String DATA_EXPLORER_SETTINGS =
-			SettingsPackage.PACKAGE_SETTINGS + PACKAGE_SEPARATOR + "dataexplorer";
+			SettingsPackage.PACKAGE_SETTINGS + PACKAGE_SEPARATOR + DataExplorerController.ID;
 	private static final List<String> DATA_MANAGER_ENTITY_READ_AUTHORITIES = Arrays.asList(
 			FreemarkerTemplateMetaData.FREEMARKER_TEMPLATE, REF_DATA_CATEGORY_TYPES, REF_AGE_TYPES,
 			REF_COLLECTION_TYPES, REF_COUNTRIES, REF_DISEASE_TYPES, REF_EXP_DATA_TYPES, REF_MATERIAL_TYPES,

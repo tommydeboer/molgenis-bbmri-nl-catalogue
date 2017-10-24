@@ -7,8 +7,6 @@ import org.molgenis.data.jobs.Progress;
 import org.molgenis.promise.PromiseMapperType;
 import org.molgenis.promise.client.PromiseDataParser;
 import org.molgenis.promise.model.PromiseCredentials;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -17,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
@@ -25,8 +24,6 @@ import static org.molgenis.promise.model.BbmriNlCheatSheet.SAMPLE_COLLECTIONS_EN
 @Component
 class RadboudMapper implements PromiseMapper, ApplicationListener<ContextRefreshedEvent>
 {
-	private static final Logger LOG = LoggerFactory.getLogger(RadboudMapper.class);
-
 	static final String XML_ID = "ID";
 	static final String XML_IDAA = "IDAA";
 
@@ -34,9 +31,6 @@ class RadboudMapper implements PromiseMapper, ApplicationListener<ContextRefresh
 	private final DataService dataService;
 	private final PromiseMapperFactory promiseMapperFactory;
 	private final EntityManager entityManager;
-
-	private int newBiobanks;
-	private int existingBiobanks;
 
 	@Autowired
 	public RadboudMapper(PromiseDataParser promiseDataParser, DataService dataService,
@@ -77,8 +71,8 @@ class RadboudMapper implements PromiseMapper, ApplicationListener<ContextRefresh
 		progress.increment(1);
 
 		progress.status("Mapping RADBOUD biobanks");
-		newBiobanks = 0;
-		existingBiobanks = 0;
+		final AtomicInteger newBiobanks = new AtomicInteger(0);
+		final AtomicInteger existingBiobanks = new AtomicInteger(0);
 		promiseDataParser.parse(promiseCredentials, 0, biobankEntity ->
 		{
 			if (!shouldMap(biobankEntity)) return;
@@ -91,14 +85,14 @@ class RadboudMapper implements PromiseMapper, ApplicationListener<ContextRefresh
 				{
 					bbmriSampleCollection = biobankMapper.mapNewBiobank(biobankEntity, samples, diseases);
 					dataService.add(SAMPLE_COLLECTIONS_ENTITY, bbmriSampleCollection);
-					newBiobanks++;
+					newBiobanks.incrementAndGet();
 				}
 				else
 				{
 					bbmriSampleCollection = biobankMapper.mapExistingBiobank(biobankEntity, samples, diseases,
 							bbmriSampleCollection);
 					dataService.update(SAMPLE_COLLECTIONS_ENTITY, bbmriSampleCollection);
-					existingBiobanks++;
+					existingBiobanks.incrementAndGet();
 				}
 			}
 			else
@@ -107,9 +101,10 @@ class RadboudMapper implements PromiseMapper, ApplicationListener<ContextRefresh
 			}
 		});
 
-		progress.status(format("Mapped %d new biobanks and %d existing biobanks", newBiobanks, existingBiobanks));
+		progress.status(
+				format("Mapped %d new biobanks and %d existing biobanks", newBiobanks.get(), existingBiobanks.get()));
 		progress.increment(1);
-		return newBiobanks + existingBiobanks;
+		return newBiobanks.get() + existingBiobanks.get();
 	}
 
 	static String getBiobankId(Map<String, String> radboudEntity)

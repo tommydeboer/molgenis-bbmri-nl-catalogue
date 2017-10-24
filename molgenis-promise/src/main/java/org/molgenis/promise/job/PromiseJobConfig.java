@@ -29,7 +29,7 @@ public class PromiseJobConfig
 	private final ScheduledJobTypeFactory scheduledJobTypeFactory;
 	private final PromiseJobExecutionMetadata promiseJobExecutionMetadata;
 	private final PromiseMapperFactory promiseMapperFactory;
-	private DataService dataService;
+	private final DataService dataService;
 
 	public PromiseJobConfig(ScheduledJobTypeFactory scheduledJobTypeFactory,
 			PromiseJobExecutionMetadata promiseJobExecutionMetadata, PromiseMapperFactory promiseMapperFactory,
@@ -63,11 +63,12 @@ public class PromiseJobConfig
 
 	@Lazy
 	@Bean
+	@SuppressWarnings("squid:S1192")
 	public ScheduledJobType promiseJobType()
 	{
 		ScheduledJobType result = scheduledJobTypeFactory.create(PromiseJobExecutionMetadata.JOB_TYPE);
 		result.setLabel("ProMISe");
-		result.setDescription("testtestests");
+		result.setDescription("Job that translates ProMISe biobank entities to BBMRI sample collection entities");
 		result.setSchema(gson.toJson(of("title", "Promise Job", "type", "object", "properties",
 				of("biobankId", of("type", "string", "description", "The identifier of the target biobank."), "mapper",
 						of("type", "string", "description", "The Promise Mapper Type to use.", "enum",
