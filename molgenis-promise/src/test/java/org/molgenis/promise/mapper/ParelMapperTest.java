@@ -38,7 +38,7 @@ public class ParelMapperTest
 	public void setupBeforeClass()
 	{
 		dataService = mock(DataService.class);
-		parelMapper = new ParelMapper(mock(PromiseMapperFactory.class), mock(PromiseDataParser.class), dataService);
+		parelMapper = new ParelMapper(mock(PromiseDataParser.class), dataService);
 	}
 
 	@BeforeMethod
