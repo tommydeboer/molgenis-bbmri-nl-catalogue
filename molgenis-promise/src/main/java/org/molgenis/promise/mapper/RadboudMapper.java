@@ -3,131 +3,103 @@ package org.molgenis.promise.mapper;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
 import org.molgenis.data.EntityManager;
+import org.molgenis.data.jobs.Progress;
+import org.molgenis.promise.PromiseMapperType;
 import org.molgenis.promise.client.PromiseDataParser;
-import org.molgenis.promise.mapper.MappingReport.Status;
 import org.molgenis.promise.model.PromiseCredentials;
-import org.molgenis.promise.model.PromiseMappingProject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static org.molgenis.promise.model.BbmriNlCheatSheet.SAMPLE_COLLECTIONS_ENTITY;
 
 @Component
-class RadboudMapper implements PromiseMapper, ApplicationListener<ContextRefreshedEvent>
+class RadboudMapper implements PromiseMapper
 {
-	private static final Logger LOG = LoggerFactory.getLogger(RadboudMapper.class);
-
 	static final String XML_ID = "ID";
 	static final String XML_IDAA = "IDAA";
 
-	private final String MAPPER_ID = "RADBOUD";
-
 	private final PromiseDataParser promiseDataParser;
 	private final DataService dataService;
-	private final PromiseMapperFactory promiseMapperFactory;
 	private final EntityManager entityManager;
 
-	private int newBiobanks;
-	private int existingBiobanks;
-
 	@Autowired
-	public RadboudMapper(PromiseDataParser promiseDataParser, DataService dataService,
-			PromiseMapperFactory promiseMapperFactory, EntityManager entityManager)
+	public RadboudMapper(PromiseDataParser promiseDataParser, DataService dataService, EntityManager entityManager)
 	{
 		this.promiseDataParser = requireNonNull(promiseDataParser);
 		this.dataService = requireNonNull(dataService);
-		this.promiseMapperFactory = requireNonNull(promiseMapperFactory);
 		this.entityManager = requireNonNull(entityManager);
 	}
 
 	@Override
-	public String getId()
+	public PromiseMapperType getType()
 	{
-		return MAPPER_ID;
+		return PromiseMapperType.RADBOUD;
 	}
 
 	@Override
-	public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent)
+	@Transactional
+	public int map(Progress progress, PromiseCredentials promiseCredentials, String unusedBiobankId) throws IOException
 	{
-		promiseMapperFactory.registerMapper(MAPPER_ID, this);
-	}
+		RadboudSampleMap samples = new RadboudSampleMap(dataService);
+		RadboudDiseaseMap diseases = new RadboudDiseaseMap(dataService);
+		RadboudBiobankMapper biobankMapper = new RadboudBiobankMapper(dataService, entityManager);
 
-	@Override
-	public MappingReport map(PromiseMappingProject promiseMappingProject)
-	{
-		requireNonNull(promiseMappingProject);
-
-		MappingReport report = new MappingReport();
-
-		try
+		progress.setProgressMax(3);
+		progress.progress(0, "Reading RADBOUD samples");
+		promiseDataParser.parse(promiseCredentials, 1, sampleEntity ->
 		{
-			RadboudSampleMap samples = new RadboudSampleMap(dataService);
-			RadboudDiseaseMap diseases = new RadboudDiseaseMap(dataService);
-			RadboudBiobankMapper biobankMapper = new RadboudBiobankMapper(dataService, entityManager);
+			if (shouldMap(sampleEntity)) samples.addSample(sampleEntity);
+		});
+		progress.status(format("Processed %d RADBOUD samples", samples.getNumberOfSamples()));
+		progress.increment(1);
 
-			PromiseCredentials credentials = promiseMappingProject.getPromiseCredentials();
+		progress.status("Reading RADBOUD disease types");
+		promiseDataParser.parse(promiseCredentials, 2, diseases::addDisease);
+		progress.status(format("Processed %d RADBOUD disease types", diseases.getNumberOfDiseaseTypes()));
+		progress.increment(1);
 
-			LOG.info("Reading RADBOUD samples");
-			promiseDataParser.parse(credentials, 1, sampleEntity ->
+		progress.status("Mapping RADBOUD biobanks");
+		final AtomicInteger newBiobanks = new AtomicInteger(0);
+		final AtomicInteger existingBiobanks = new AtomicInteger(0);
+		promiseDataParser.parse(promiseCredentials, 0, biobankEntity ->
+		{
+			if (!shouldMap(biobankEntity)) return;
+
+			String biobankId = getBiobankId(biobankEntity);
+			if (samples.hasSamplesFor(biobankId))
 			{
-				if (shouldMap(sampleEntity)) samples.addSample(sampleEntity);
-			});
-			LOG.info("Processed {} RADBOUD samples", samples.getNumberOfSamples());
-
-			LOG.info("Reading RADBOUD disease types");
-			promiseDataParser.parse(credentials, 2, diseases::addDisease);
-			LOG.info("Processed {} RADBOUD disease types", diseases.getNumberOfDiseaseTypes());
-
-			LOG.info("Mapping RADBOUD biobanks");
-			newBiobanks = 0;
-			existingBiobanks = 0;
-			promiseDataParser.parse(credentials, 0, biobankEntity ->
-			{
-				if (!shouldMap(biobankEntity)) return;
-
-				String biobankId = getBiobankId(biobankEntity);
-				if (samples.hasSamplesFor(biobankId))
+				Entity bbmriSampleCollection = dataService.findOneById(SAMPLE_COLLECTIONS_ENTITY, biobankId);
+				if (bbmriSampleCollection == null)
 				{
-					Entity bbmriSampleCollection = dataService.findOneById(SAMPLE_COLLECTIONS_ENTITY, biobankId);
-					if (bbmriSampleCollection == null)
-					{
-						bbmriSampleCollection = biobankMapper.mapNewBiobank(biobankEntity, samples, diseases);
-						dataService.add(SAMPLE_COLLECTIONS_ENTITY, bbmriSampleCollection);
-						newBiobanks++;
-					}
-					else
-					{
-						bbmriSampleCollection = biobankMapper
-								.mapExistingBiobank(biobankEntity, samples, diseases, bbmriSampleCollection);
-						dataService.update(SAMPLE_COLLECTIONS_ENTITY, bbmriSampleCollection);
-						existingBiobanks++;
-					}
+					bbmriSampleCollection = biobankMapper.mapNewBiobank(biobankEntity, samples, diseases);
+					dataService.add(SAMPLE_COLLECTIONS_ENTITY, bbmriSampleCollection);
+					newBiobanks.incrementAndGet();
 				}
 				else
 				{
-					LOG.warn("No samples found for biobank with id {}", biobankId);
+					bbmriSampleCollection = biobankMapper.mapExistingBiobank(biobankEntity, samples, diseases,
+							bbmriSampleCollection);
+					dataService.update(SAMPLE_COLLECTIONS_ENTITY, bbmriSampleCollection);
+					existingBiobanks.incrementAndGet();
 				}
-			});
+			}
+			else
+			{
+				progress.status(format("No samples found for biobank with id %s", biobankId));
+			}
+		});
 
-			LOG.info("Mapped {} new biobanks and {} existing biobanks", newBiobanks, existingBiobanks);
-			report.setStatus(Status.SUCCESS);
-		}
-		catch (Exception e)
-		{
-			report.setStatus(Status.ERROR);
-			report.setMessage(e.getMessage());
-
-			LOG.warn("Error in mapping response to entities", e);
-		}
-
-		return report;
+		progress.status(
+				format("Mapped %d new biobanks and %d existing biobanks", newBiobanks.get(), existingBiobanks.get()));
+		progress.increment(1);
+		return newBiobanks.get() + existingBiobanks.get();
 	}
 
 	static String getBiobankId(Map<String, String> radboudEntity)
