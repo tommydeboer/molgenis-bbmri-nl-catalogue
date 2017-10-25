@@ -7,7 +7,7 @@ import org.molgenis.promise.PromiseMapperType;
 
 import static org.molgenis.promise.job.PromiseJobExecutionMetadata.*;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({ "unused", "WeakerAccess" })
 public class PromiseJobExecution extends JobExecution
 {
 	public PromiseJobExecution(Entity entity)
@@ -28,14 +28,24 @@ public class PromiseJobExecution extends JobExecution
 		setType(JOB_TYPE);
 	}
 
-	String getBiobankId()
+	public String getBiobankId()
 	{
 		return getString(BIOBANK_ID);
 	}
 
-	String getCredentials()
+	public void setBiobankId(String biobankId)
+	{
+		set(BIOBANK_ID, biobankId);
+	}
+
+	public String getCredentials()
 	{
 		return getString(CREDENTIALS);
+	}
+
+	public void setCredentials(String credentials)
+	{
+		set(CREDENTIALS, credentials);
 	}
 
 	public PromiseMapperType getMapper()
