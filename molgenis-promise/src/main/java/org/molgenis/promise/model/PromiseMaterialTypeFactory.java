@@ -10,8 +10,7 @@ public class PromiseMaterialTypeFactory
 		extends AbstractSystemEntityFactory<PromiseMaterialType, PromiseMaterialTypeMetadata, String>
 {
 	@Autowired
-	PromiseMaterialTypeFactory(PromiseMaterialTypeMetadata promiseMaterialTypeMetadata,
-			EntityPopulator entityPopulator)
+	PromiseMaterialTypeFactory(PromiseMaterialTypeMetadata promiseMaterialTypeMetadata, EntityPopulator entityPopulator)
 	{
 		super(PromiseMaterialType.class, promiseMaterialTypeMetadata, entityPopulator);
 	}

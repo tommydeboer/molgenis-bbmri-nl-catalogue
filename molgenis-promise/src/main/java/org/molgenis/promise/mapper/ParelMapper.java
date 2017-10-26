@@ -11,8 +11,6 @@ import org.molgenis.promise.client.PromiseDataParser;
 import org.molgenis.promise.model.BbmriNlCheatSheet;
 import org.molgenis.promise.model.PromiseCredentials;
 import org.molgenis.promise.model.PromiseMaterialType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +34,6 @@ import static org.molgenis.promise.model.PromiseMaterialTypeMetadata.PROMISE_MAT
 public class ParelMapper implements PromiseMapper
 {
 	private static final String UNKNOWN = "Unknown";
-
 	private final PromiseDataParser promiseDataParser;
 	private final DataService dataService;
 
