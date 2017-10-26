@@ -5,7 +5,6 @@
         <plugin id="dataexplorer" name="Catalogue" url="dataexplorer"/>
         <menu label="Data Integration" name="dataintegration">
             <plugin id="importwizard" name="Upload" url="importwizard"/>
-            <plugin id="fileingest" name="Automatic imports" url="fileingest"/>
             <plugin id="scheduledjobs" name="Scheduled Jobs" url="scheduledjobs"/>
             <plugin id="mappingservice" name="Mapping Service" url="mappingservice"/>
             <plugin id="sortaservice" name="SORTA" url="sortaservice"/>

@@ -74,7 +74,7 @@ public class PromiseJobConfig
 						of("type", "string", "description", "The Promise Mapper Type to use.", "enum",
 								ImmutableList.of(PAREL, RADBOUD)), "credentials",
 						of("type", "string", "description", "The identifier of the PromiseCredentials entity to use")),
-				"required", ImmutableList.of("biobankId", "mapper", "biobankId"))));
+				"required", ImmutableList.of("biobankId", "mapper", "credentials"))));
 		result.setJobExecutionType(promiseJobExecutionMetadata);
 		return result;
 	}

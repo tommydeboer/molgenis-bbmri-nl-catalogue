@@ -140,6 +140,11 @@
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
+            <artifactId>molgenis-searchall</artifactId>
+            <version>${molgenis.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.molgenis</groupId>
             <artifactId>molgenis-data-annotators</artifactId>
             <version>${molgenis.version}</version>
         </dependency>
@@ -216,6 +221,11 @@
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-scripts-core</artifactId>
+            <version>${molgenis.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.molgenis</groupId>
+            <artifactId>molgenis-file-ingester</artifactId>
             <version>${molgenis.version}</version>
         </dependency>
         <dependency>
