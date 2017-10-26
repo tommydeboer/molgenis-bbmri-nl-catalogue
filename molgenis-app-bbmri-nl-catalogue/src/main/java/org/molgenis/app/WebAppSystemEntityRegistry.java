@@ -33,6 +33,8 @@ import static org.molgenis.data.meta.model.AttributeMetadata.ATTRIBUTE_META_DATA
 import static org.molgenis.data.meta.model.EntityTypeMetadata.ENTITY_TYPE_META_DATA;
 import static org.molgenis.data.meta.model.Package.PACKAGE_SEPARATOR;
 import static org.molgenis.data.meta.model.PackageMetadata.PACKAGE;
+import static org.molgenis.genomebrowser.meta.GenomeBrowserAttributesMetadata.GENOMEBROWSERATTRIBUTES;
+import static org.molgenis.genomebrowser.meta.GenomeBrowserSettingsMetadata.GENOMEBROWSERSETTINGS;
 import static org.molgenis.promise.model.BbmriNlCheatSheet.*;
 import static org.molgenis.security.core.utils.SecurityUtils.*;
 
@@ -66,7 +68,7 @@ public class WebAppSystemEntityRegistry implements SystemEntityRegistry
 			PACKAGE, REF_BIOBANKS, REF_COLLECTION_TYPES, REF_COUNTRIES, REF_DATA_CATEGORY_TYPES, REF_DISEASE_TYPES,
 			REF_EXP_DATA_TYPES, REF_JURISTIC_PERSONS, REF_MATERIAL_TYPES, LanguageMetadata.LANGUAGE, REF_PERSONS,
 			REF_PUBLICATIONS, SAMPLE_COLLECTIONS_ENTITY, REF_SAMPLE_SIZE_TYPES, REF_SEX_TYPES, REF_STAFF_SIZE_TYPES,
-			DATA_EXPLORER_SETTINGS);
+			DATA_EXPLORER_SETTINGS, GENOMEBROWSERATTRIBUTES, GENOMEBROWSERSETTINGS);
 
 	private final DataService dataService;
 	private final UserAuthorityFactory userAuthorityFactory;
